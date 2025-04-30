@@ -1,63 +1,126 @@
 const Product = require('../models/Product');
+const User = require('../models/User');
+const Order = require('../models/Order');
 
 // @desc    Create a new product
 // @route   POST /api/products
 // @access  Private/Admin
-const createProduct = (req, res) => {
+const createProduct = async (req, res) => {
     try {
-        const { name, description, price, category, stock, images } = req.body;
-
-        // Validate input data
-        if (!name || !description || !price || !category) {
-            return res.status(400).json({ message: 'Please provide all required fields' });
-        }
-
-        // Create product
-        const product = Product.create({
+        const {
             name,
             description,
             price,
             category,
-            stock: stock || 0,
-            images: images || []
+            brand,
+            countInStock,
+            imagePath,
+            isFeatured,
+            discount
+        } = req.body;
+
+        // Validate input data
+        if (!name || !description || !price || !category || !brand) {
+            return res.status(400).json({ message: 'Please provide all required fields' });
+        }
+
+        // Create product
+        const product = await Product.create({
+            name,
+            description,
+            price,
+            category,
+            brand,
+            countInStock: countInStock || 0,
+            imagePath: imagePath || '/images/default-product.jpg',
+            isFeatured: isFeatured || false,
+            discount: discount || 0
         });
 
         res.status(201).json(product);
     } catch (error) {
         console.error('Error in createProduct:', error);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
 // @desc    Get all products
 // @route   GET /api/products
 // @access  Public
-const getProducts = (req, res) => {
+const getProducts = async (req, res) => {
     try {
-        const { category, minPrice, maxPrice, search } = req.query;
+        const {
+            category,
+            minPrice,
+            maxPrice,
+            search,
+            featured,
+            sort,
+            limit = 10,
+            page = 1
+        } = req.query;
 
-        // Apply filters if any
-        const filters = {};
-        if (category) filters.category = category;
-        if (minPrice) filters.minPrice = parseFloat(minPrice);
-        if (maxPrice) filters.maxPrice = parseFloat(maxPrice);
-        if (search) filters.search = search;
+        // Build filter object
+        const filter = {};
 
-        const products = Product.findAll(filters);
+        if (category) filter.category = category;
+        if (minPrice && maxPrice) {
+            filter.price = { $gte: parseFloat(minPrice), $lte: parseFloat(maxPrice) };
+        } else if (minPrice) {
+            filter.price = { $gte: parseFloat(minPrice) };
+        } else if (maxPrice) {
+            filter.price = { $lte: parseFloat(maxPrice) };
+        }
 
-        res.status(200).json(products);
+        if (featured === 'true') filter.isFeatured = true;
+
+        // Text search if provided
+        if (search) {
+            filter.$text = { $search: search };
+        }
+
+        // Build sort object
+        let sortOptions = {};
+        if (sort) {
+            const sortParts = sort.split(':');
+            if (sortParts.length === 2) {
+                sortOptions[sortParts[0]] = sortParts[1] === 'desc' ? -1 : 1;
+            }
+        } else {
+            // Default sort by newest
+            sortOptions = { createdAt: -1 };
+        }
+
+        // Calculate pagination
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+
+        // Execute query with pagination
+        const products = await Product.find(filter)
+            .sort(sortOptions)
+            .skip(skip)
+            .limit(parseInt(limit));
+
+        // Get total count for pagination metadata
+        const total = await Product.countDocuments(filter);
+
+        res.status(200).json({
+            products,
+            page: parseInt(page),
+            pages: Math.ceil(total / parseInt(limit)),
+            total
+        });
     } catch (error) {
         console.error('Error in getProducts:', error);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
 // @desc    Get product by ID
 // @route   GET /api/products/:id
 // @access  Public
-const getProductById = (req, res) => {
+const getProductById = async (req, res) => {
     try {
-        const product = Product.findById(parseInt(req.params.id));
+        const product = await Product.findById(req.params.id);
 
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
@@ -66,108 +129,135 @@ const getProductById = (req, res) => {
         res.status(200).json(product);
     } catch (error) {
         console.error('Error in getProductById:', error);
-        res.status(500).json({ message: 'Server error' });
+        if (error.kind === 'ObjectId') {
+            return res.status(404).json({ message: 'Product not found - invalid ID format' });
+        }
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
 // @desc    Update product
 // @route   PUT /api/products/:id
 // @access  Private/Admin
-const updateProduct = (req, res) => {
+const updateProduct = async (req, res) => {
     try {
-        const { name, description, price, category, stock, images } = req.body;
-        const productId = parseInt(req.params.id);
+        const productId = req.params.id;
 
-        // Check if product exists
-        if (!Product.findById(productId)) {
+        // Use findByIdAndUpdate instead of save() to bypass validation for required fields
+        const updatedProduct = await Product.findByIdAndUpdate(
+            productId,
+            { ...req.body, updatedAt: Date.now() },
+            { new: true, runValidators: false }
+        );
+
+        if (!updatedProduct) {
             return res.status(404).json({ message: 'Product not found' });
         }
-
-        // Update product
-        const updatedProduct = Product.update(productId, {
-            name,
-            description,
-            price,
-            category,
-            stock,
-            images
-        });
 
         res.status(200).json(updatedProduct);
     } catch (error) {
         console.error('Error in updateProduct:', error);
-        res.status(500).json({ message: 'Server error' });
+        if (error.kind === 'ObjectId') {
+            return res.status(404).json({ message: 'Product not found - invalid ID format' });
+        }
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
 // @desc    Delete product
 // @route   DELETE /api/products/:id
 // @access  Private/Admin
-const deleteProduct = (req, res) => {
+const deleteProduct = async (req, res) => {
     try {
-        const productId = parseInt(req.params.id);
+        const productId = req.params.id;
 
-        // Check if product exists
-        if (!Product.findById(productId)) {
+        // Find and delete product
+        const product = await Product.findById(productId);
+        if (!product) {
             return res.status(404).json({ message: 'Product not found' });
         }
 
-        // Delete product
-        const result = Product.delete(productId);
-
-        if (result) {
-            res.status(200).json({ message: 'Product deleted successfully' });
-        } else {
-            res.status(500).json({ message: 'Failed to delete product' });
-        }
+        await Product.findByIdAndDelete(productId);
+        res.status(200).json({ message: 'Product deleted successfully' });
     } catch (error) {
         console.error('Error in deleteProduct:', error);
-        res.status(500).json({ message: 'Server error' });
+        if (error.kind === 'ObjectId') {
+            return res.status(404).json({ message: 'Product not found - invalid ID format' });
+        }
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
 // @desc    Add product review
 // @route   POST /api/products/:id/reviews
 // @access  Private
-const addProductReview = (req, res) => {
+const addProductReview = async (req, res) => {
     try {
         const { rating, comment } = req.body;
-        const productId = parseInt(req.params.id);
+        const productId = req.params.id;
         const userId = req.user.id;
 
-        // Validate input
+        // Validate rating input
         if (!rating || rating < 1 || rating > 5) {
             return res.status(400).json({ message: 'Please provide a rating between 1 and 5' });
         }
 
-        // Check if product exists
-        const product = Product.findById(productId);
+        // Find the product
+        const product = await Product.findById(productId);
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
         }
 
-        // Add review
-        const review = {
-            userId,
-            rating,
-            comment: comment || '',
-            userName: req.user.name // In a real app, this would come from the user record
-        };
-
-        const result = Product.addReview(productId, review);
-
-        if (result) {
-            // Get updated product
-            const updatedProduct = Product.findById(productId);
-            res.status(201).json(updatedProduct);
-        } else {
-            res.status(500).json({ message: 'Failed to add review' });
+        // Get user information
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
         }
+
+        // Initialize reviews array if it doesn't exist
+        if (!Array.isArray(product.reviews)) {
+            product.reviews = [];
+        }
+
+        // Create review object
+        const newReview = {
+            user: userId,
+            name: user.name,
+            rating: Number(rating),
+            comment: comment || '',
+            createdAt: Date.now()
+        };
+        
+        // Add review to product
+        product.reviews.push(newReview);
+        
+        // Update product rating average
+        product.rating = product.reviews.reduce((acc, item) => acc + item.rating, 0) / product.reviews.length;
+        
+        // Update review count
+        product.numReviews = product.reviews.length;
+        
+        // Save product with new review
+        await product.save();
+        
+        // Send success response
+        res.status(201).json({
+            success: true,
+            message: 'Review added successfully',
+            review: newReview,
+            productRating: product.rating,
+            numReviews: product.numReviews
+        });
+        
     } catch (error) {
         console.error('Error in addProductReview:', error);
-        res.status(500).json({ message: 'Server error' });
+        if (error.kind === 'ObjectId') {
+            return res.status(404).json({ message: 'Invalid product ID format' });
+        }
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
+
 
 module.exports = {
     createProduct,

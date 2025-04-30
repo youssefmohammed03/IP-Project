@@ -2,6 +2,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const config = require('./config/config');
+const connectDB = require('./config/db');
 const cors = require('cors');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
@@ -14,6 +15,9 @@ const orderRoutes = require('./routes/orderRoutes');
 
 // Load environment variables from .env file
 dotenv.config();
+
+// Connect to MongoDB
+connectDB();
 
 const app = express();
 const PORT = config.PORT;

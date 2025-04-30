@@ -1,88 +1,80 @@
-/**
- * User Model
- * 
- * In a real implementation, this would be a database schema
- * For now, we'll use a dummy implementation
- */
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
-// Simulating a database with an array
-const users = [];
-let nextId = 1;
+const userSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: [true, 'Name is required'],
+        trim: true
+    },
+    email: {
+        type: String,
+        required: [true, 'Email is required'],
+        unique: true,
+        trim: true,
+        lowercase: true,
+        match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please provide a valid email address']
+    },
+    password: {
+        type: String,
+        required: [true, 'Password is required'],
+        minlength: [6, 'Password must be at least 6 characters']
+    },
+    role: {
+        type: String,
+        enum: ['customer', 'admin'],
+        default: 'customer'
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    updatedAt: {
+        type: Date,
+        default: Date.now
+    }
+});
 
-// Create a default admin user
-const createDefaultAdmin = () => {
-    // Only create if there are no users yet
-    if (users.length === 0) {
-        const adminUser = {
-            id: nextId++,
-            name: 'System Admin',
-            email: 'admin@system.com',
-            // This is a properly hashed version of 'admin123' using bcrypt
-            password: '$2b$10$ChLAjaK02TQ.26FoCB4N.OAaPUqQ5v4JquY95zycIKukRcYzxMena',
-            role: 'admin',
-            createdAt: new Date(),
-            updatedAt: new Date()
-        };
-        users.push(adminUser);
-        console.log('Default admin user created with email: admin@system.com and password: admin123');
+// Middleware to hash password before saving
+userSchema.pre('save', async function(next) {
+    // Only hash the password if it's been modified (or is new)
+    if (!this.isModified('password')) return next();
+    
+    try {
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(this.password, salt);
+        next();
+    } catch (error) {
+        next(error);
+    }
+});
+
+// Method to compare passwords
+userSchema.methods.comparePassword = async function(candidatePassword) {
+    return await bcrypt.compare(candidatePassword, this.password);
+};
+
+// Static method to create default admin
+userSchema.statics.createDefaultAdmin = async function() {
+    try {
+        const adminExists = await this.findOne({ role: 'admin' });
+        if (!adminExists) {
+            await this.create({
+                name: 'System Admin',
+                email: 'admin@system.com',
+                password: 'admin123', // Will be hashed by pre-save middleware
+                role: 'admin'
+            });
+            console.log('Default admin user created with email: admin@system.com and password: admin123');
+        }
+    } catch (error) {
+        console.error('Error creating default admin:', error);
     }
 };
 
-// Create the default admin user immediately
-createDefaultAdmin();
+const User = mongoose.model('User', userSchema);
 
-const User = {
-    // Create a new user
-    create: (userData) => {
-        const user = {
-            id: nextId++,
-            name: userData.name,
-            email: userData.email,
-            password: userData.password,
-            role: userData.role || 'customer',
-            createdAt: new Date(),
-            updatedAt: new Date()
-        };
-        users.push(user);
-        return user;
-    },
-
-    // Find a user by email
-    findByEmail: (email) => {
-        return users.find(user => user.email === email);
-    },
-
-    // Find a user by ID
-    findById: (id) => {
-        return users.find(user => user.id === id);
-    },
-
-    // Get all users
-    findAll: () => {
-        return [...users];
-    },
-
-    // Update a user
-    update: (id, userData) => {
-        const index = users.findIndex(user => user.id === id);
-        if (index === -1) return null;
-
-        users[index] = {
-            ...users[index],
-            ...userData,
-            updatedAt: new Date()
-        };
-        return users[index];
-    },
-
-    // Delete a user
-    delete: (id) => {
-        const index = users.findIndex(user => user.id === id);
-        if (index === -1) return false;
-
-        users.splice(index, 1);
-        return true;
-    }
-};
+// Create default admin user
+User.createDefaultAdmin();
 
 module.exports = User;

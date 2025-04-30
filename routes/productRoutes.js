@@ -10,7 +10,7 @@ const {
 } = require('../controllers/productController');
 const auth = require('../middleware/auth');
 const checkRole = require('../middleware/checkRole');
-const { validateProduct } = require('../middleware/validation');
+const { validateProduct, validateProductUpdate } = require('../middleware/validation');
 
 // @route   GET /api/products
 // @desc    Get all products
@@ -30,7 +30,7 @@ router.post('/', auth, checkRole(['admin']), validateProduct, createProduct);
 // @route   PUT /api/products/:id
 // @desc    Update a product
 // @access  Private/Admin
-router.put('/:id', auth, checkRole(['admin']), validateProduct, updateProduct);
+router.put('/:id', auth, checkRole(['admin']), validateProductUpdate, updateProduct);
 
 // @route   DELETE /api/products/:id
 // @desc    Delete a product

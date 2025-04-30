@@ -1,115 +1,106 @@
-/**
- * Product Model
- * 
- * In a real implementation, this would be a database schema
- * For now, we'll use a dummy implementation
- */
+const mongoose = require('mongoose');
 
-// Simulating a database with an array
-const products = [];
-let nextId = 1;
-
-const Product = {
-    // Create a new product
-    create: (productData) => {
-        const product = {
-            id: nextId++,
-            name: productData.name,
-            description: productData.description,
-            price: productData.price,
-            images: productData.images || [],
-            category: productData.category,
-            stock: productData.stock || 0,
-            ratings: [],
-            reviews: [],
-            createdAt: new Date(),
-            updatedAt: new Date()
-        };
-        products.push(product);
-        return product;
+const reviewSchema = new mongoose.Schema({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     },
-
-    // Find a product by ID
-    findById: (id) => {
-        return products.find(product => product.id === id);
+    name: {
+        type: String,
+        required: true
     },
-
-    // Get all products
-    findAll: (filters = {}) => {
-        let result = [...products];
-
-        // Apply filters if any
-        if (filters.category) {
-            result = result.filter(product => product.category === filters.category);
-        }
-
-        if (filters.minPrice) {
-            result = result.filter(product => product.price >= filters.minPrice);
-        }
-
-        if (filters.maxPrice) {
-            result = result.filter(product => product.price <= filters.maxPrice);
-        }
-
-        if (filters.search) {
-            const searchTerm = filters.search.toLowerCase();
-            result = result.filter(product =>
-                product.name.toLowerCase().includes(searchTerm) ||
-                product.description.toLowerCase().includes(searchTerm)
-            );
-        }
-
-        return result;
+    rating: {
+        type: Number,
+        required: true,
+        min: 1,
+        max: 5
     },
-
-    // Update a product
-    update: (id, productData) => {
-        const index = products.findIndex(product => product.id === id);
-        if (index === -1) return null;
-
-        products[index] = {
-            ...products[index],
-            ...productData,
-            updatedAt: new Date()
-        };
-        return products[index];
+    comment: {
+        type: String,
+        required: false
     },
-
-    // Delete a product
-    delete: (id) => {
-        const index = products.findIndex(product => product.id === id);
-        if (index === -1) return false;
-
-        products.splice(index, 1);
-        return true;
-    },
-
-    // Update stock
-    updateStock: (id, quantity) => {
-        const product = products.find(product => product.id === id);
-        if (!product) return false;
-
-        product.stock += quantity;
-        product.updatedAt = new Date();
-        return true;
-    },
-
-    // Add a review
-    addReview: (id, review) => {
-        const product = products.find(product => product.id === id);
-        if (!product) return false;
-
-        review.id = product.reviews.length + 1;
-        review.createdAt = new Date();
-
-        product.reviews.push(review);
-
-        // Calculate average rating
-        const totalRating = product.reviews.reduce((sum, r) => sum + r.rating, 0);
-        product.averageRating = totalRating / product.reviews.length;
-
-        return true;
+    createdAt: {
+        type: Date,
+        default: Date.now
     }
-};
+}, { _id: true });
+
+const productSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: [true, 'Product name is required'],
+        trim: true
+    },
+    description: {
+        type: String,
+        required: [true, 'Product description is required']
+    },
+    price: {
+        type: Number,
+        required: [true, 'Price is required'],
+        min: [0, 'Price cannot be negative']
+    },
+    category: {
+        type: String,
+        required: [true, 'Category is required'],
+        enum: ['electronics', 'clothing', 'books', 'home', 'beauty', 'sports', 'other']
+    },
+    brand: {
+        type: String,
+        required: [true, 'Brand is required']
+    },
+    countInStock: {
+        type: Number,
+        required: [true, 'Stock count is required'],
+        min: [0, 'Stock count cannot be negative'],
+        default: 0
+    },
+    rating: {
+        type: Number,
+        default: 0,
+        min: 0,
+        max: 5
+    },
+    numReviews: {
+        type: Number,
+        default: 0,
+        min: 0
+    },
+    reviews: [reviewSchema],
+    imagePath: {
+        type: String,
+        default: '/images/default-product.jpg'
+    },
+    isFeatured: {
+        type: Boolean,
+        default: false
+    },
+    discount: {
+        type: Number,
+        min: 0,
+        max: 100,
+        default: 0
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    updatedAt: {
+        type: Date,
+        default: Date.now
+    }
+});
+
+// Add index for faster searches
+productSchema.index({ name: 'text', description: 'text', brand: 'text', category: 'text' });
+
+// Pre-save middleware to update the updatedAt field
+productSchema.pre('save', function(next) {
+    this.updatedAt = Date.now();
+    next();
+});
+
+const Product = mongoose.model('Product', productSchema);
 
 module.exports = Product;

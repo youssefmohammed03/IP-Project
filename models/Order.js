@@ -1,75 +1,126 @@
-/**
- * Order Model
- * 
- * In a real implementation, this would be a database schema
- * For now, we'll use a dummy implementation
- */
+const mongoose = require('mongoose');
 
-// Simulating a database with an array
-const orders = [];
-let nextId = 1;
-
-const Order = {
-    // Create a new order
-    create: (orderData) => {
-        const order = {
-            id: nextId++,
-            userId: orderData.userId,
-            items: orderData.items,
-            subtotal: orderData.subtotal,
-            tax: orderData.tax || 0,
-            shipping: orderData.shipping || 0,
-            total: orderData.total,
-            paymentMethod: orderData.paymentMethod,
-            shippingAddress: orderData.shippingAddress,
-            status: 'pending',
-            createdAt: new Date(),
-            updatedAt: new Date()
-        };
-        orders.push(order);
-        return order;
+const orderItemSchema = new mongoose.Schema({
+    product: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product',
+        required: true
     },
-
-    // Find an order by ID
-    findById: (id) => {
-        return orders.find(order => order.id === id);
+    quantity: {
+        type: Number,
+        required: true,
+        min: 1
     },
-
-    // Get all orders for a user
-    findByUserId: (userId) => {
-        return orders.filter(order => order.userId === userId);
+    price: {
+        type: Number,
+        required: true
     },
-
-    // Get all orders
-    findAll: () => {
-        return [...orders];
-    },
-
-    // Update order status
-    updateStatus: (id, status) => {
-        const order = orders.find(order => order.id === id);
-        if (!order) return null;
-
-        order.status = status;
-        order.updatedAt = new Date();
-
-        return order;
-    },
-
-    // Process refund
-    processRefund: (id, refundData) => {
-        const order = orders.find(order => order.id === id);
-        if (!order) return null;
-
-        order.refund = {
-            ...refundData,
-            processedAt: new Date()
-        };
-        order.status = 'refunded';
-        order.updatedAt = new Date();
-
-        return order;
+    name: {
+        type: String,
+        required: true
     }
-};
+});
+
+const shippingAddressSchema = new mongoose.Schema({
+    address: {
+        type: String,
+        required: true
+    },
+    city: {
+        type: String,
+        required: true
+    },
+    postalCode: {
+        type: String,
+        required: true
+    },
+    country: {
+        type: String,
+        required: true
+    },
+    phone: {
+        type: String,
+        required: true
+    }
+});
+
+const orderSchema = new mongoose.Schema({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    orderItems: [orderItemSchema],
+    shippingAddress: shippingAddressSchema,
+    paymentMethod: {
+        type: String,
+        required: true,
+        enum: ['credit_card', 'debit_card', 'paypal', 'cash_on_delivery']
+    },
+    paymentResult: {
+        id: String,
+        status: String,
+        update_time: String,
+        email_address: String
+    },
+    itemsPrice: {
+        type: Number,
+        required: true,
+        default: 0.0
+    },
+    shippingPrice: {
+        type: Number,
+        required: true,
+        default: 0.0
+    },
+    taxPrice: {
+        type: Number,
+        required: true,
+        default: 0.0
+    },
+    totalPrice: {
+        type: Number,
+        required: true,
+        default: 0.0
+    },
+    isPaid: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    paidAt: {
+        type: Date
+    },
+    isDelivered: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    deliveredAt: {
+        type: Date
+    },
+    status: {
+        type: String,
+        required: true,
+        enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'],
+        default: 'pending'
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    updatedAt: {
+        type: Date,
+        default: Date.now
+    }
+});
+
+// Pre-save middleware to update the updatedAt field
+orderSchema.pre('save', function (next) {
+    this.updatedAt = Date.now();
+    next();
+});
+
+const Order = mongoose.model('Order', orderSchema);
 
 module.exports = Order;

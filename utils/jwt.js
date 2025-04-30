@@ -4,7 +4,7 @@ const config = require('../config/config');
 // Generate JWT token
 const generateToken = (user) => {
     const payload = {
-        id: user.id,
+        id: user.id || user._id,
         email: user.email,
         role: user.role
     };

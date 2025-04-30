@@ -19,15 +19,15 @@ router.get('/', auth, getCart);
 // @access  Private
 router.post('/', auth, addToCart);
 
-// @route   PUT /api/cart/:productId
+// @route   PUT /api/cart/:itemId
 // @desc    Update cart item quantity
 // @access  Private
-router.put('/:productId', auth, updateCartItem);
+router.put('/:itemId', auth, updateCartItem);
 
-// @route   DELETE /api/cart/:productId
+// @route   DELETE /api/cart/:itemId
 // @desc    Remove item from cart
 // @access  Private
-router.delete('/:productId', auth, removeFromCart);
+router.delete('/:itemId', auth, removeFromCart);
 
 // @route   DELETE /api/cart
 // @desc    Clear cart

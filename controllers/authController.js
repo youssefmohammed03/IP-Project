@@ -1,4 +1,3 @@
-const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const { generateToken } = require('../utils/jwt');
 
@@ -10,37 +9,40 @@ const register = async (req, res) => {
         const { name, email, password } = req.body;
 
         // Check if user already exists
-        const existingUser = User.findByEmail(email);
+        const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).json({ message: 'User already exists' });
         }
 
-        // Hash password
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-
-        // Create user
-        const user = User.create({
+        // Create user - password hashing is handled by the User model's pre-save middleware
+        const user = await User.create({
             name,
             email,
-            password: hashedPassword,
+            password,
             role: 'customer'
         });
 
-        // Remove password from response
-        const userResponse = { ...user };
-        delete userResponse.password;
-
         // Generate JWT token
-        const token = generateToken(user);
+        const token = generateToken({
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role
+        });
 
         res.status(201).json({
-            user: userResponse,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                createdAt: user.createdAt
+            },
             token
         });
     } catch (error) {
         console.error('Error in register:', error);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
@@ -52,62 +54,65 @@ const login = async (req, res) => {
         const { email, password } = req.body;
 
         // Check if user exists
-        const user = User.findByEmail(email);
+        const user = await User.findOne({ email });
         if (!user) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
 
         // Check if password is correct
-        const isMatch = await bcrypt.compare(password, user.password);
+        const isMatch = await user.comparePassword(password);
         if (!isMatch) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
 
-        // Remove password from response
-        const userResponse = { ...user };
-        delete userResponse.password;
-
         // Generate JWT token
-        const token = generateToken(user);
+        const token = generateToken({
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role
+        });
 
         res.status(200).json({
-            user: userResponse,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                createdAt: user.createdAt
+            },
             token
         });
     } catch (error) {
         console.error('Error in login:', error);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
 // @desc    Get current user
 // @route   GET /api/auth/me
 // @access  Private
-const getCurrentUser = (req, res) => {
+const getCurrentUser = async (req, res) => {
     try {
-        const user = User.findById(req.user.id);
+        const user = await User.findById(req.user.id).select('-password');
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // Remove password from response
-        const userResponse = { ...user };
-        delete userResponse.password;
-
-        res.status(200).json(userResponse);
+        res.status(200).json(user);
     } catch (error) {
         console.error('Error in getCurrentUser:', error);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
 // @desc    Update user role (for testing purposes only)
 // @route   PUT /api/auth/role/:id
-// @access  admin
-const updateUserRole = (req, res) => {
+// @access  Admin only
+const updateUserRole = async (req, res) => {
     try {
         const { role } = req.body;
-        const userId = parseInt(req.params.id);
+        const userId = req.params.id;
 
         // Validate role
         if (!role || (role !== 'admin' && role !== 'customer')) {
@@ -115,23 +120,26 @@ const updateUserRole = (req, res) => {
         }
 
         // Find and update user
-        const user = User.findById(userId);
+        const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
         // Update user role
         user.role = role;
-        user.updatedAt = new Date();
+        await user.save();
 
-        // Remove password from response
-        const userResponse = { ...user };
-        delete userResponse.password;
-
-        res.status(200).json(userResponse);
+        res.status(200).json({
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt
+        });
     } catch (error) {
         console.error('Error in updateUserRole:', error);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 

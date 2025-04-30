@@ -60,9 +60,9 @@ const validateLogin = (req, res, next) => {
     next();
 };
 
-// Validator for product creation and update
+// Validator for product creation
 const validateProduct = (req, res, next) => {
-    const { name, description, price, category } = req.body;
+    const { name, description, price, category, brand, countInStock } = req.body;
     const errors = [];
 
     // Validate name
@@ -85,6 +85,56 @@ const validateProduct = (req, res, next) => {
     // Validate category
     if (!category || category.trim() === '') {
         errors.push('Category is required');
+    }
+
+    // Validate brand
+    if (!brand || brand.trim() === '') {
+        errors.push('Brand is required');
+    }
+
+    // Validate countInStock
+    if (countInStock === undefined || countInStock === null) {
+        errors.push('Count in stock is required');
+    } else if (isNaN(countInStock) || countInStock < 0) {
+        errors.push('Count in stock must be a non-negative number');
+    }
+
+    // Return errors if any
+    if (errors.length > 0) {
+        return res.status(400).json({ errors });
+    }
+
+    next();
+};
+
+// Validator for product updates - only validates fields that are present
+const validateProductUpdate = (req, res, next) => {
+    const { name, description, price, category, brand, countInStock } = req.body;
+    const errors = [];
+
+    // Only validate fields that are provided in the update
+    if (name !== undefined && name.trim() === '') {
+        errors.push('Product name cannot be empty');
+    }
+
+    if (description !== undefined && description.trim() === '') {
+        errors.push('Product description cannot be empty');
+    }
+
+    if (price !== undefined && (isNaN(price) || price <= 0)) {
+        errors.push('Price must be a positive number');
+    }
+
+    if (category !== undefined && category.trim() === '') {
+        errors.push('Category cannot be empty');
+    }
+
+    if (brand !== undefined && brand.trim() === '') {
+        errors.push('Brand cannot be empty');
+    }
+
+    if (countInStock !== undefined && (isNaN(countInStock) || countInStock < 0)) {
+        errors.push('Count in stock must be a non-negative number');
     }
 
     // Return errors if any
@@ -127,5 +177,6 @@ module.exports = {
     validateRegistration,
     validateLogin,
     validateProduct,
+    validateProductUpdate,
     validateOrder
 };

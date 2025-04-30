@@ -2,11 +2,12 @@ const express = require('express');
 const router = express.Router();
 const {
     createOrder,
-    getUserOrders,
+    getMyOrders,
     getOrderById,
-    updateOrderStatus,
-    processRefund,
-    getAllOrders
+    updateOrderToPaid,
+    updateOrderToDelivered,
+    cancelOrder,
+    getOrders
 } = require('../controllers/orderController');
 const auth = require('../middleware/auth');
 const checkRole = require('../middleware/checkRole');
@@ -17,29 +18,34 @@ const { validateOrder } = require('../middleware/validation');
 // @access  Private
 router.post('/', auth, validateOrder, createOrder);
 
-// @route   GET /api/orders
+// @route   GET /api/orders/myorders
 // @desc    Get all orders for current user
 // @access  Private
-router.get('/', auth, getUserOrders);
+router.get('/myorders', auth, getMyOrders);
 
 // @route   GET /api/orders/:id
 // @desc    Get order by ID
 // @access  Private
 router.get('/:id', auth, getOrderById);
 
-// @route   PUT /api/orders/:id/status
-// @desc    Update order status
-// @access  Private/Admin
-router.put('/:id/status', auth, checkRole(['admin']), updateOrderStatus);
+// @route   PUT /api/orders/:id/pay
+// @desc    Update order to paid
+// @access  Private
+router.put('/:id/pay', auth, updateOrderToPaid);
 
-// @route   POST /api/orders/:id/refund
-// @desc    Process refund
+// @route   PUT /api/orders/:id/deliver
+// @desc    Update order to delivered
 // @access  Private/Admin
-router.post('/:id/refund', auth, checkRole(['admin']), processRefund);
+router.put('/:id/deliver', auth, checkRole(['admin']), updateOrderToDelivered);
 
-// @route   GET /api/orders/admin/all
+// @route   PUT /api/orders/:id/cancel
+// @desc    Cancel an order
+// @access  Private
+router.put('/:id/cancel', auth, cancelOrder);
+
+// @route   GET /api/orders
 // @desc    Get all orders (admin only)
 // @access  Private/Admin
-router.get('/admin/all', auth, checkRole(['admin']), getAllOrders);
+router.get('/', auth, checkRole(['admin']), getOrders);
 
 module.exports = router;
