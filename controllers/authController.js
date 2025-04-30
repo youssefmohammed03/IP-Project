@@ -103,7 +103,7 @@ const getCurrentUser = (req, res) => {
 
 // @desc    Update user role (for testing purposes only)
 // @route   PUT /api/auth/role/:id
-// @access  Public (In production, this would be restricted to admins or superadmins)
+// @access  admin
 const updateUserRole = (req, res) => {
     try {
         const { role } = req.body;

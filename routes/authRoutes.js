@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { register, login, getCurrentUser, updateUserRole } = require('../controllers/authController');
 const auth = require('../middleware/auth');
+const checkRole = require('../middleware/checkRole');
 const { validateRegistration, validateLogin } = require('../middleware/validation');
 
 // @route   POST /api/auth/register
@@ -21,7 +22,7 @@ router.get('/me', auth, getCurrentUser);
 
 // @route   PUT /api/auth/role/:id
 // @desc    Update user role (testing purposes only)
-// @access  Public (would be restricted in production)
-router.put('/role/:id', updateUserRole);
+// @access  Admin only
+router.put('/role/:id', auth, checkRole(['admin']), updateUserRole);
 
 module.exports = router;

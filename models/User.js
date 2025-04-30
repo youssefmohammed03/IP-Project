@@ -9,6 +9,28 @@
 const users = [];
 let nextId = 1;
 
+// Create a default admin user
+const createDefaultAdmin = () => {
+    // Only create if there are no users yet
+    if (users.length === 0) {
+        const adminUser = {
+            id: nextId++,
+            name: 'System Admin',
+            email: 'admin@system.com',
+            // This is a properly hashed version of 'admin123' using bcrypt
+            password: '$2b$10$ChLAjaK02TQ.26FoCB4N.OAaPUqQ5v4JquY95zycIKukRcYzxMena',
+            role: 'admin',
+            createdAt: new Date(),
+            updatedAt: new Date()
+        };
+        users.push(adminUser);
+        console.log('Default admin user created with email: admin@system.com and password: admin123');
+    }
+};
+
+// Create the default admin user immediately
+createDefaultAdmin();
+
 const User = {
     // Create a new user
     create: (userData) => {
@@ -16,7 +38,7 @@ const User = {
             id: nextId++,
             name: userData.name,
             email: userData.email,
-            password: userData.password, // In a real app, this would be hashed
+            password: userData.password,
             role: userData.role || 'customer',
             createdAt: new Date(),
             updatedAt: new Date()
