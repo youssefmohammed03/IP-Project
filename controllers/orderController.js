@@ -46,8 +46,8 @@ const createOrder = async (req, res) => {
     // Calculate shipping based on address and items
     const shippingPrice = calculateShipping(shippingAddress, orderItems);
 
-    // Apply promotions if promo code exists
-    const { discount, finalPrice } = applyPromotions(
+    // Apply promotions if promo code exists - now uses async function
+    const { discount, finalPrice } = await applyPromotions(
       itemsPrice,
       promoCode
     );

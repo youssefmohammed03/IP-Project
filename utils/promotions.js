@@ -1,92 +1,80 @@
 /**
- * Utility functions for promotions and discounts
+ * Utility functions for promotions and discounts using Promotion model
  */
-
-// Dummy implementation for coupons
-const coupons = [
-    { code: 'WELCOME10', discount: 10, type: 'percentage', expiryDate: '2025-12-31', minPurchase: 50 },
-    { code: 'SAVE20', discount: 20, type: 'percentage', expiryDate: '2025-12-31', minPurchase: 100 },
-    { code: 'FLAT15', discount: 15, type: 'fixed', expiryDate: '2025-12-31', minPurchase: 0 }
-];
+const Promotion = require('../models/Promotion');
 
 /**
- * Validates if a coupon is valid and applicable
- * @param {string} code - Coupon code
+ * Validates if a promotion code is valid and applicable
+ * @param {string} code - Promotion code
  * @param {number} subtotal - Cart subtotal
- * @returns {object} - Coupon object or null if invalid
+ * @returns {object} - Result object with valid status and promotion or message
  */
-const validateCoupon = (code, subtotal) => {
-    const coupon = coupons.find(c => c.code === code);
+const validatePromotion = async (code, subtotal) => {
+    try {
+        if (!code) {
+            return { valid: false, message: 'No promotion code provided' };
+        }
 
-    if (!coupon) {
-        return { valid: false, message: 'Invalid coupon code' };
+        // Find the promotion in the database
+        const promotion = await Promotion.findOne({ code: code.toUpperCase() });
+
+        if (!promotion) {
+            return { valid: false, message: 'Invalid promotion code' };
+        }
+
+        // Use the model's isValid method to check validity
+        return promotion.isValid(subtotal);
+    } catch (error) {
+        console.error('Error validating promotion:', error);
+        return { valid: false, message: 'Error processing promotion code' };
     }
+};
 
-    // Check expiry date
-    if (new Date(coupon.expiryDate) < new Date()) {
-        return { valid: false, message: 'Coupon has expired' };
-    }
+/**
+ * Apply promotions to calculate discount
+ * @param {number} subtotal - Cart subtotal
+ * @param {string} promoCode - Promotion code
+ * @returns {object} - Discount and final price
+ */
+const applyPromotions = async (subtotal, promoCode) => {
+    try {
+        let discount = 0;
 
-    // Check minimum purchase amount
-    if (subtotal < coupon.minPurchase) {
+        if (promoCode) {
+            const validationResult = await validatePromotion(promoCode, subtotal);
+
+            if (validationResult.valid) {
+                // Calculate discount using the model's method
+                discount = validationResult.promotion.calculateDiscount(subtotal);
+
+                // Increment usage count
+                validationResult.promotion.usedCount += 1;
+                await validationResult.promotion.save();
+            }
+        }
+
+        // Ensure discount doesn't exceed subtotal
+        discount = Math.min(discount, subtotal);
+
+        // Calculate final price after discount
+        const finalPrice = subtotal - discount;
+
         return {
-            valid: false,
-            message: `Minimum purchase amount for this coupon is $${coupon.minPurchase}`
+            discount,
+            finalPrice,
+            promoCode: promoCode || null
+        };
+    } catch (error) {
+        console.error('Error applying promotions:', error);
+        return {
+            discount: 0,
+            finalPrice: subtotal,
+            promoCode: null
         };
     }
-
-    return { valid: true, coupon };
-};
-
-/**
- * Calculates discount amount
- * @param {object} coupon - Coupon object
- * @param {number} subtotal - Cart subtotal
- * @returns {number} - Discount amount
- */
-const calculateDiscount = (coupon, subtotal) => {
-    if (coupon.type === 'percentage') {
-        return (subtotal * coupon.discount) / 100;
-    } else {
-        return coupon.discount;
-    }
-};
-
-/**
- * Apply special promotions (e.g., buy one get one free)
- * @param {array} items - Cart items
- * @param {string} promoType - Promotion type
- * @returns {number} - Additional discount amount
- */
-const applyPromotion = (items, promoType) => {
-    let additionalDiscount = 0;
-
-    switch (promoType) {
-        case 'buyOneGetOne':
-            // Find eligible items (dummy implementation)
-            const eligibleItems = items.filter(item => item.price > 50);
-            if (eligibleItems.length > 0) {
-                const cheapestItem = eligibleItems.reduce(
-                    (min, item) => item.price < min.price ? item : min,
-                    eligibleItems[0]
-                );
-                additionalDiscount = cheapestItem.price;
-            }
-            break;
-
-        case 'freeShipping':
-            additionalDiscount = 10; // Assume flat shipping cost of $10
-            break;
-
-        default:
-            additionalDiscount = 0;
-    }
-
-    return additionalDiscount;
 };
 
 module.exports = {
-    validateCoupon,
-    calculateDiscount,
-    applyPromotion
+    validatePromotion,
+    applyPromotions
 };
