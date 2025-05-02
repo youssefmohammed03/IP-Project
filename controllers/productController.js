@@ -227,19 +227,19 @@ const addProductReview = async (req, res) => {
             comment: comment || '',
             createdAt: Date.now()
         };
-        
+
         // Add review to product
         product.reviews.push(newReview);
-        
+
         // Update product rating average
         product.rating = product.reviews.reduce((acc, item) => acc + item.rating, 0) / product.reviews.length;
-        
+
         // Update review count
         product.numReviews = product.reviews.length;
-        
+
         // Save product with new review
         await product.save();
-        
+
         // Send success response
         res.status(201).json({
             success: true,
@@ -248,7 +248,7 @@ const addProductReview = async (req, res) => {
             productRating: product.rating,
             numReviews: product.numReviews
         });
-        
+
     } catch (error) {
         console.error('Error in addProductReview:', error);
         if (error.kind === 'ObjectId') {
@@ -258,6 +258,76 @@ const addProductReview = async (req, res) => {
     }
 };
 
+// @desc    Apply discount to a product
+// @route   PUT /api/products/:id/discount
+// @access  Private/Admin
+const applyDiscount = async (req, res) => {
+    try {
+        const { discount, expiryDate } = req.body;
+        const productId = req.params.id;
+
+        // Validate discount input
+        if (discount === undefined || discount === null) {
+            return res.status(400).json({ message: 'Please provide a discount value' });
+        }
+
+        if (isNaN(discount) || discount < 0 || discount > 100) {
+            return res.status(400).json({ message: 'Discount must be a number between 0 and 100' });
+        }
+
+        // Find the product
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        // Set discount and optionally discount expiry date
+        product.discount = Number(discount);
+
+        if (expiryDate) {
+            const expiry = new Date(expiryDate);
+            if (isNaN(expiry.getTime())) {
+                return res.status(400).json({ message: 'Invalid expiry date format' });
+            }
+
+            // Add discountExpiry field if not already in the schema
+            product.discountExpiry = expiry;
+        } else if (discount > 0) {
+            // If no expiry provided but discount applied, set default expiry to 30 days
+            const defaultExpiry = new Date();
+            defaultExpiry.setDate(defaultExpiry.getDate() + 30);
+            product.discountExpiry = defaultExpiry;
+        } else {
+            // If discount is 0 (removing discount), remove expiry date too
+            product.discountExpiry = null;
+        }
+
+        // Save product with new discount
+        product.price = product.price * (1 - product.discount / 100); // Update price based on discount
+        await product.save();
+
+        // Send success response
+        res.status(200).json({
+            success: true,
+            message: discount > 0 ? 'Discount applied successfully' : 'Discount removed successfully',
+            product: {
+                _id: product._id,
+                name: product.name,
+                price: product.price,
+                discount: product.discount,
+                discountExpiry: product.discountExpiry,
+                finalPrice: product.price * (1 - product.discount / 100)
+            }
+        });
+
+    } catch (error) {
+        console.error('Error in applyDiscount:', error);
+        if (error.kind === 'ObjectId') {
+            return res.status(404).json({ message: 'Invalid product ID format' });
+        }
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
 
 module.exports = {
     createProduct,
@@ -265,5 +335,6 @@ module.exports = {
     getProductById,
     updateProduct,
     deleteProduct,
-    addProductReview
+    addProductReview,
+    applyDiscount
 };

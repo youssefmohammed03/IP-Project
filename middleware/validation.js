@@ -146,23 +146,82 @@ const validateProductUpdate = (req, res, next) => {
 };
 
 // Validator for order creation
-const validateOrder = (req, res, next) => {
-    const { shippingAddress, paymentMethod } = req.body;
+const validateOrder = async (req, res, next) => {
+    const { shippingAddress, paymentMethod, promoCode } = req.body;
     const errors = [];
 
-    // Validate shipping address
+    // Validate shipping address with more comprehensive checks
     if (!shippingAddress) {
         errors.push('Shipping address is required');
     } else {
-        const { address, city, postalCode, country } = shippingAddress;
-        if (!address || !city || !postalCode || !country) {
-            errors.push('Complete shipping address is required');
+        const { address, city, postalCode, country, phone } = shippingAddress;
+
+        // Check required shipping address fields
+        if (!address || address.trim() === '') {
+            errors.push('Street address is required');
+        }
+
+        if (!city || city.trim() === '') {
+            errors.push('City is required');
+        }
+
+        if (!postalCode || postalCode.trim() === '') {
+            errors.push('Postal code is required');
+        } else if (!/^[a-zA-Z0-9\s-]{3,10}$/.test(postalCode.trim())) {
+            errors.push('Invalid postal code format');
+        }
+
+        if (!country || country.trim() === '') {
+            errors.push('Country is required');
+        }
+
+        // Phone validation
+        if (!phone || phone.trim() === '') {
+            errors.push('Phone number is required');
+        } else if (!/^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,4}[-\s.]?[0-9]{1,9}$/.test(phone.trim())) {
+            errors.push('Invalid phone number format');
         }
     }
 
-    // Validate payment method
+    // Validate payment method against allowed values
+    const allowedPaymentMethods = ['credit_card', 'debit_card', 'paypal', 'cash_on_delivery'];
     if (!paymentMethod) {
         errors.push('Payment method is required');
+    } else if (!allowedPaymentMethods.includes(paymentMethod)) {
+        errors.push(`Payment method must be one of: ${allowedPaymentMethods.join(', ')}`);
+    }
+
+    // Check user's cart before creating order
+    try {
+        const Cart = require('../models/Cart');
+        const userId = req.user.id;
+        const cart = await Cart.findOne({ user: userId }).populate('items.product');
+
+        if (!cart || cart.items.length === 0) {
+            errors.push('Cannot create an order with an empty cart');
+        } else {
+            // Check stock availability for all items
+            const stockErrors = [];
+            cart.items.forEach(item => {
+                if (!item.product) {
+                    stockErrors.push(`Product in cart no longer exists`);
+                } else if (item.quantity > item.product.countInStock) {
+                    stockErrors.push(`Not enough stock for ${item.product.name}. Available: ${item.product.countInStock}`);
+                }
+
+                // Validate quantity (must be between 1 and 10)
+                if (item.quantity < 1 || item.quantity > 10) {
+                    stockErrors.push(`Quantity for ${item.product.name} must be between 1 and 10`);
+                }
+            });
+
+            if (stockErrors.length > 0) {
+                errors.push(...stockErrors);
+            }
+        }
+    } catch (error) {
+        console.error('Error validating cart items:', error);
+        errors.push('Error validating cart items');
     }
 
     // Return errors if any

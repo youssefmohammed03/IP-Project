@@ -102,8 +102,24 @@ const orderSchema = new mongoose.Schema({
     status: {
         type: String,
         required: true,
-        enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'],
+        enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'refund_requested', 'refunded'],
         default: 'pending'
+    },
+    // Refund related fields
+    refundReason: {
+        type: String
+    },
+    refundNotes: {
+        type: String
+    },
+    adminRefundNotes: {
+        type: String
+    },
+    refundDeniedReason: {
+        type: String
+    },
+    refundedAt: {
+        type: Date
     },
     createdAt: {
         type: Date,

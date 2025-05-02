@@ -1,7 +1,7 @@
 const Order = require('../models/Order');
 const Cart = require('../models/Cart');
 const Product = require('../models/Product');
-const { calculateShipping } = require('../utils/shipping');
+const { calculateShipping, calculateTax } = require('../utils/shipping');
 const { applyPromotions } = require('../utils/promotions');
 
 // @desc    Create a new order
@@ -46,14 +46,23 @@ const createOrder = async (req, res) => {
     // Calculate shipping based on address and items
     const shippingPrice = calculateShipping(shippingAddress, orderItems);
 
-    // Apply promotions if promo code exists - now uses async function
-    const { discount, finalPrice } = await applyPromotions(
+    // Apply promotions if promo code exists
+    const promotionResult = await applyPromotions(
       itemsPrice,
       promoCode
     );
 
-    const taxPrice = finalPrice * 0.15; // 15% tax
-    const totalPrice = finalPrice + shippingPrice + taxPrice;
+    // Check if promotion code is valid (if one was provided)
+    if (promoCode && !promotionResult.isValid) {
+      return res.status(400).json({
+        message: promotionResult.message || 'Invalid promotion code'
+      });
+    }
+
+    // Calculate tax based on the shipping country
+    const taxPrice = calculateTax(shippingAddress, promotionResult.finalPrice);
+
+    const totalPrice = promotionResult.finalPrice + shippingPrice + taxPrice;
 
     // Create the order
     const order = await Order.create({
@@ -64,7 +73,7 @@ const createOrder = async (req, res) => {
       itemsPrice,
       taxPrice,
       shippingPrice,
-      discount,
+      discount: promotionResult.discount,
       totalPrice,
       promoCode: promoCode || ''
     });
@@ -146,9 +155,9 @@ const getOrderById = async (req, res) => {
   }
 };
 
-// @desc    Update order to paid
+// @desc    Update order to paid (Admin only)
 // @route   PUT /api/orders/:id/pay
-// @access  Private
+// @access  Private/Admin
 const updateOrderToPaid = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
@@ -158,20 +167,18 @@ const updateOrderToPaid = async (req, res) => {
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    // Check if the order belongs to the logged in user or user is admin
-    if (req.user.role !== 'admin' && order.user.toString() !== req.user.id) {
-      return res.status(403).json({ message: 'Not authorized to update this order' });
-    }
-
     // Update order payment status
     order.isPaid = true;
     order.paidAt = Date.now();
     order.paymentResult = {
-      id: req.body.id,
-      status: req.body.status,
-      update_time: req.body.update_time,
-      email_address: req.body.payer ? req.body.payer.email_address : req.user.email
+      id: Date.now().toString(),
+      status: 'COMPLETED',
+      update_time: new Date().toISOString(),
+      email_address: 'admin@example.com'
     };
+
+    // Update order status to processing once paid
+    order.status = 'processing';
 
     const updatedOrder = await order.save();
     res.status(200).json(updatedOrder);
@@ -186,7 +193,7 @@ const updateOrderToPaid = async (req, res) => {
 
 // @desc    Update order to delivered
 // @route   PUT /api/orders/:id/deliver
-// @access  Private/Admin
+// @access  Private (Both admin and order owner)
 const updateOrderToDelivered = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
@@ -196,14 +203,64 @@ const updateOrderToDelivered = async (req, res) => {
       return res.status(404).json({ message: 'Order not found' });
     }
 
+    // Check if the order belongs to the logged in user or user is admin
+    if (req.user.role !== 'admin' && order.user.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'Not authorized to update this order' });
+    }
+
+    // Check if order is paid (can't mark unpaid orders as delivered)
+    if (!order.isPaid) {
+      return res.status(400).json({ message: 'Cannot mark unpaid order as delivered' });
+    }
+
     // Update order delivery status
     order.isDelivered = true;
     order.deliveredAt = Date.now();
+
+    // Update order status to delivered
+    order.status = 'delivered';
 
     const updatedOrder = await order.save();
     res.status(200).json(updatedOrder);
   } catch (error) {
     console.error('Error in updateOrderToDelivered:', error);
+    if (error.kind === 'ObjectId') {
+      return res.status(404).json({ message: 'Order not found - invalid ID format' });
+    }
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// @desc    Update order to shipped (Admin only)
+// @route   PUT /api/orders/:id/ship
+// @access  Private/Admin
+const updateOrderToShipped = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    // Check if order exists
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    // Check if order is paid (can't ship unpaid orders)
+    if (!order.isPaid) {
+      return res.status(400).json({ message: 'Cannot ship unpaid order' });
+    }
+
+    // Check if order is already delivered
+    if (order.isDelivered) {
+      return res.status(400).json({ message: 'Order is already delivered' });
+    }
+
+    // Update order status to shipped
+    order.status = 'shipped';
+    order.updatedAt = Date.now();
+
+    const updatedOrder = await order.save();
+    res.status(200).json(updatedOrder);
+  } catch (error) {
+    console.error('Error in updateOrderToShipped:', error);
     if (error.kind === 'ObjectId') {
       return res.status(404).json({ message: 'Order not found - invalid ID format' });
     }
@@ -257,6 +314,115 @@ const cancelOrder = async (req, res) => {
   }
 };
 
+// @desc    Request a refund for an order
+// @route   PUT /api/orders/:id/request-refund
+// @access  Private
+const requestRefund = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    // Check if order exists
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    // Check if the order belongs to the logged in user
+    if (order.user.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'Not authorized to request refund for this order' });
+    }
+
+    // Check if order is delivered (can only request refund for delivered orders)
+    if (!order.isDelivered) {
+      return res.status(400).json({ message: 'Cannot request refund for undelivered order' });
+    }
+
+    // Check if order is already cancelled or refunded
+    if (order.status === 'cancelled' || order.status === 'refunded') {
+      return res.status(400).json({ message: `Cannot request refund for ${order.status} order` });
+    }
+
+    // Check if refund is already requested
+    if (order.status === 'refund_requested') {
+      return res.status(400).json({ message: 'Refund already requested for this order' });
+    }
+
+    // Add refund reason and notes if provided
+    const { reason, notes } = req.body;
+    order.refundReason = reason || 'Customer requested refund';
+    if (notes) order.refundNotes = notes;
+
+    // Update order status to refund_requested
+    order.status = 'refund_requested';
+    order.updatedAt = Date.now();
+
+    const updatedOrder = await order.save();
+    res.status(200).json(updatedOrder);
+  } catch (error) {
+    console.error('Error in requestRefund:', error);
+    if (error.kind === 'ObjectId') {
+      return res.status(404).json({ message: 'Order not found - invalid ID format' });
+    }
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// @desc    Process refund for an order (Admin only)
+// @route   PUT /api/orders/:id/process-refund
+// @access  Private/Admin
+const processRefund = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    // Check if order exists
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    // Check if refund is requested
+    if (order.status !== 'refund_requested') {
+      return res.status(400).json({ message: 'No refund requested for this order' });
+    }
+
+    // Add admin notes if provided
+    const { adminNotes, approved } = req.body;
+
+    if (adminNotes) {
+      order.adminRefundNotes = adminNotes;
+    }
+
+    // Update order status based on admin decision
+    if (approved === false) {
+      order.status = 'delivered'; // Reset to delivered if refund is denied
+      order.refundDeniedReason = req.body.reason || 'Refund request denied by admin';
+    } else {
+      // Process the refund
+      order.status = 'refunded';
+      order.refundedAt = Date.now();
+
+      // Return items to stock if specified
+      if (req.body.restoreStock) {
+        for (const item of order.orderItems) {
+          const product = await Product.findById(item.product);
+          if (product) {
+            product.countInStock += item.quantity;
+            await product.save();
+          }
+        }
+      }
+    }
+
+    order.updatedAt = Date.now();
+    const updatedOrder = await order.save();
+    res.status(200).json(updatedOrder);
+  } catch (error) {
+    console.error('Error in processRefund:', error);
+    if (error.kind === 'ObjectId') {
+      return res.status(404).json({ message: 'Order not found - invalid ID format' });
+    }
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
 module.exports = {
   createOrder,
   getOrders,
@@ -264,5 +430,8 @@ module.exports = {
   getOrderById,
   updateOrderToPaid,
   updateOrderToDelivered,
-  cancelOrder
+  updateOrderToShipped,
+  cancelOrder,
+  requestRefund,
+  processRefund
 };

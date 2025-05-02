@@ -6,7 +6,8 @@ const {
     getProductById,
     updateProduct,
     deleteProduct,
-    addProductReview
+    addProductReview,
+    applyDiscount
 } = require('../controllers/productController');
 const auth = require('../middleware/auth');
 const checkRole = require('../middleware/checkRole');
@@ -41,5 +42,10 @@ router.delete('/:id', auth, checkRole(['admin']), deleteProduct);
 // @desc    Add a review to a product
 // @access  Private
 router.post('/:id/reviews', auth, addProductReview);
+
+// @route   PUT /api/products/:id/discount
+// @desc    Apply discount to a product
+// @access  Private/Admin
+router.put('/:id/discount', auth, checkRole(['admin']), applyDiscount);
 
 module.exports = router;

@@ -34,39 +34,58 @@ const validatePromotion = async (code, subtotal) => {
  * Apply promotions to calculate discount
  * @param {number} subtotal - Cart subtotal
  * @param {string} promoCode - Promotion code
- * @returns {object} - Discount and final price
+ * @returns {object} - Discount, final price, and validation result
  */
 const applyPromotions = async (subtotal, promoCode) => {
     try {
-        let discount = 0;
-
-        if (promoCode) {
-            const validationResult = await validatePromotion(promoCode, subtotal);
-
-            if (validationResult.valid) {
-                // Calculate discount using the model's method
-                discount = validationResult.promotion.calculateDiscount(subtotal);
-
-                // Increment usage count
-                validationResult.promotion.usedCount += 1;
-                await validationResult.promotion.save();
-            }
+        // If no promo code, return valid result with no discount
+        if (!promoCode) {
+            return {
+                isValid: true,
+                discount: 0,
+                finalPrice: subtotal,
+                promoCode: null
+            };
         }
 
-        // Ensure discount doesn't exceed subtotal
-        discount = Math.min(discount, subtotal);
+        // Validate the promotion code
+        const validationResult = await validatePromotion(promoCode, subtotal);
 
-        // Calculate final price after discount
-        const finalPrice = subtotal - discount;
+        if (validationResult.valid) {
+            // Calculate discount using the model's method
+            const discount = validationResult.promotion.calculateDiscount(subtotal);
 
-        return {
-            discount,
-            finalPrice,
-            promoCode: promoCode || null
-        };
+            // Increment usage count
+            validationResult.promotion.usedCount += 1;
+            await validationResult.promotion.save();
+
+            // Ensure discount doesn't exceed subtotal
+            const finalDiscount = Math.min(discount, subtotal);
+
+            // Calculate final price after discount
+            const finalPrice = subtotal - finalDiscount;
+
+            return {
+                isValid: true,
+                discount: finalDiscount,
+                finalPrice,
+                promoCode
+            };
+        } else {
+            // Return invalid result with error message
+            return {
+                isValid: false,
+                message: validationResult.message || 'Invalid promotion code',
+                discount: 0,
+                finalPrice: subtotal,
+                promoCode: null
+            };
+        }
     } catch (error) {
         console.error('Error applying promotions:', error);
         return {
+            isValid: false,
+            message: 'Error processing promotion code',
             discount: 0,
             finalPrice: subtotal,
             promoCode: null

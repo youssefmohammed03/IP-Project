@@ -82,6 +82,10 @@ const productSchema = new mongoose.Schema({
         max: 100,
         default: 0
     },
+    discountExpiry: {
+        type: Date,
+        default: null
+    },
     createdAt: {
         type: Date,
         default: Date.now
@@ -95,8 +99,26 @@ const productSchema = new mongoose.Schema({
 // Add index for faster searches
 productSchema.index({ name: 'text', description: 'text', brand: 'text', category: 'text' });
 
+// Virtual field for final price after discount
+productSchema.virtual('finalPrice').get(function () {
+    // Check if discount is active (has a valid expiry date in the future or no expiry date set)
+    const isDiscountActive = !this.discountExpiry || new Date(this.discountExpiry) > new Date();
+
+    // Calculate final price with discount if active
+    if (this.discount > 0 && isDiscountActive) {
+        return this.price * (1 - this.discount / 100);
+    }
+
+    // Return original price if no discount or expired
+    return this.price;
+});
+
+// Configure the schema to include virtuals when converting to JSON
+productSchema.set('toJSON', { virtuals: true });
+productSchema.set('toObject', { virtuals: true });
+
 // Pre-save middleware to update the updatedAt field
-productSchema.pre('save', function(next) {
+productSchema.pre('save', function (next) {
     this.updatedAt = Date.now();
     next();
 });

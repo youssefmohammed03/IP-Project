@@ -6,7 +6,10 @@ const {
     getOrderById,
     updateOrderToPaid,
     updateOrderToDelivered,
+    updateOrderToShipped,
     cancelOrder,
+    requestRefund,
+    processRefund,
     getOrders
 } = require('../controllers/orderController');
 const auth = require('../middleware/auth');
@@ -29,19 +32,34 @@ router.get('/myorders', auth, getMyOrders);
 router.get('/:id', auth, getOrderById);
 
 // @route   PUT /api/orders/:id/pay
-// @desc    Update order to paid
-// @access  Private
-router.put('/:id/pay', auth, updateOrderToPaid);
+// @desc    Update order to paid (Admin only)
+// @access  Private/Admin
+router.put('/:id/pay', auth, checkRole(['admin']), updateOrderToPaid);
+
+// @route   PUT /api/orders/:id/ship
+// @desc    Update order to shipped (Admin only)
+// @access  Private/Admin
+router.put('/:id/ship', auth, checkRole(['admin']), updateOrderToShipped);
 
 // @route   PUT /api/orders/:id/deliver
-// @desc    Update order to delivered
-// @access  Private/Admin
-router.put('/:id/deliver', auth, checkRole(['admin']), updateOrderToDelivered);
+// @desc    Update order to delivered (for both customers and admins)
+// @access  Private
+router.put('/:id/deliver', auth, updateOrderToDelivered);
 
 // @route   PUT /api/orders/:id/cancel
 // @desc    Cancel an order
 // @access  Private
 router.put('/:id/cancel', auth, cancelOrder);
+
+// @route   PUT /api/orders/:id/request-refund
+// @desc    Request a refund for a delivered order
+// @access  Private
+router.put('/:id/request-refund', auth, requestRefund);
+
+// @route   PUT /api/orders/:id/process-refund
+// @desc    Process (approve or deny) a refund request (Admin only)
+// @access  Private/Admin
+router.put('/:id/process-refund', auth, checkRole(['admin']), processRefund);
 
 // @route   GET /api/orders
 // @desc    Get all orders (admin only)
