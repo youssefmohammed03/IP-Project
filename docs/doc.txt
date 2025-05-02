@@ -1,0 +1,334 @@
+## Base URL
+All API requests should be prefixed with: `/api`
+
+## Authentication
+Most endpoints require authentication using JWT tokens. After login or registration, you'll receive a token that should be included in the request headers as:
+```
+Authorization: Bearer YOUR_TOKEN
+```
+
+## User Authentication APIs
+
+### Register a new user
+- **URL**: `/api/auth/register`
+- **Method**: `POST`
+- **Authentication**: None (Public)
+- **Request Body**:
+  ```json
+  {
+    "name": "User Name",
+    "email": "user@example.com",
+    "password": "password123"
+  }
+  ```
+- **Response**: Returns user data and JWT token
+  ```json
+  {
+    "user": {
+      "id": "user_id",
+      "name": "User Name",
+      "email": "user@example.com",
+      "role": "customer",
+      "createdAt": "timestamp"
+    },
+    "token": "JWT_TOKEN"
+  }
+  ```
+
+### Login
+- **URL**: `/api/auth/login`
+- **Method**: `POST`
+- **Authentication**: None (Public)
+- **Request Body**:
+  ```json
+  {
+    "email": "user@example.com",
+    "password": "password123"
+  }
+  ```
+- **Response**: Returns user data and JWT token (same format as register)
+
+### Get Current User Profile
+- **URL**: `/api/auth/me`
+- **Method**: `GET`
+- **Authentication**: Required
+- **Response**: Returns user data (excluding password)
+
+## Product APIs
+
+### Get All Products
+- **URL**: `/api/products`
+- **Method**: `GET`
+- **Authentication**: None (Public)
+- **Query Parameters**:
+  - `category`: Filter by product category
+  - `minPrice`: Minimum price filter
+  - `maxPrice`: Maximum price filter
+  - `search`: Text search in product fields
+  - `featured`: Set to "true" to get featured products only
+  - `sort`: Format as "field:direction" (e.g., "price:asc")
+  - `limit`: Number of results per page (default: 10)
+  - `page`: Page number (default: 1)
+- **Response**:
+  ```json
+  {
+    "products": [...],
+    "page": 1,
+    "pages": 5,
+    "total": 50
+  }
+  ```
+
+### Get Product by ID
+- **URL**: `/api/products/:id`
+- **Method**: `GET`
+- **Authentication**: None (Public)
+- **Response**: Returns detailed product data
+
+### Create Product (Admin Only)
+- **URL**: `/api/products`
+- **Method**: `POST`
+- **Authentication**: Admin only
+- **Request Body**:
+  ```json
+  {
+    "name": "Product Name",
+    "description": "Product description",
+    "price": 99.99,
+    "category": "electronics",
+    "brand": "Brand Name",
+    "countInStock": 100,
+    "imagePath": "/images/product.jpg",
+    "isFeatured": false,
+    "discount": 0
+  }
+  ```
+- **Response**: Returns created product data
+
+### Update Product (Admin Only)
+- **URL**: `/api/products/:id`
+- **Method**: `PUT`
+- **Authentication**: Admin only
+- **Request Body**: Same as create product (partial updates allowed)
+- **Response**: Returns updated product data
+
+### Delete Product (Admin Only)
+- **URL**: `/api/products/:id`
+- **Method**: `DELETE`
+- **Authentication**: Admin only
+- **Response**: Success message
+
+### Add Product Review
+- **URL**: `/api/products/:id/reviews`
+- **Method**: `POST`
+- **Authentication**: Required
+- **Request Body**:
+  ```json
+  {
+    "rating": 5,
+    "comment": "Great product!"
+  }
+  ```
+- **Response**: Returns review info and updated product rating
+
+### Apply Discount to Product (Admin Only)
+- **URL**: `/api/products/:id/discount`
+- **Method**: `PUT`
+- **Authentication**: Admin only
+- **Request Body**:
+  ```json
+  {
+    "discount": 10,
+    "expiryDate": "2025-06-01T00:00:00.000Z"
+  }
+  ```
+- **Response**: Returns product with updated discount info
+
+## Cart APIs
+
+### Get User's Cart
+- **URL**: `/api/cart`
+- **Method**: `GET`
+- **Authentication**: Required
+- **Response**: 
+  ```json
+  {
+    "cart": {
+      "items": [...],
+      "user": "user_id"
+    },
+    "total": 299.97
+  }
+  ```
+
+### Add Item to Cart
+- **URL**: `/api/cart`
+- **Method**: `POST`
+- **Authentication**: Required
+- **Request Body**:
+  ```json
+  {
+    "productId": "product_id",
+    "quantity": 2
+  }
+  ```
+- **Response**: Returns updated cart and total
+
+### Update Cart Item Quantity
+- **URL**: `/api/cart/:itemId`
+- **Method**: `PUT`
+- **Authentication**: Required
+- **Request Body**:
+  ```json
+  {
+    "quantity": 3
+  }
+  ```
+- **Response**: Returns updated cart and total
+
+### Remove Item from Cart
+- **URL**: `/api/cart/:itemId`
+- **Method**: `DELETE`
+- **Authentication**: Required
+- **Response**: Returns updated cart and total
+
+### Clear Cart
+- **URL**: `/api/cart`
+- **Method**: `DELETE`
+- **Authentication**: Required
+- **Response**: Returns empty cart and success message
+
+## Order APIs
+
+### Create New Order
+- **URL**: `/api/orders`
+- **Method**: `POST`
+- **Authentication**: Required
+- **Request Body**:
+  ```json
+  {
+    "shippingAddress": {
+      "address": "123 Street",
+      "city": "City",
+      "postalCode": "12345",
+      "country": "Country"
+    },
+    "paymentMethod": "PayPal",
+    "promoCode": "DISCOUNT10" // Optional
+  }
+  ```
+- **Response**: Returns created order details
+
+### Get My Orders
+- **URL**: `/api/orders/myorders`
+- **Method**: `GET`
+- **Authentication**: Required
+- **Response**: Returns list of user's orders
+
+### Get Order by ID
+- **URL**: `/api/orders/:id`
+- **Method**: `GET`
+- **Authentication**: Required (user can only access their own orders, admin can access any)
+- **Response**: Returns detailed order information
+
+### Update Order to Paid (Admin Only)
+- **URL**: `/api/orders/:id/pay`
+- **Method**: `PUT`
+- **Authentication**: Admin only
+- **Response**: Returns updated order with payment info
+
+### Update Order to Shipped (Admin Only)
+- **URL**: `/api/orders/:id/ship`
+- **Method**: `PUT`
+- **Authentication**: Admin only
+- **Response**: Returns updated order with status "shipped"
+
+### Update Order to Delivered
+- **URL**: `/api/orders/:id/deliver`
+- **Method**: `PUT`
+- **Authentication**: Required (both customer and admin can mark as delivered)
+- **Response**: Returns updated order with delivery info
+
+### Cancel Order
+- **URL**: `/api/orders/:id/cancel`
+- **Method**: `PUT`
+- **Authentication**: Required (user can cancel their own orders, admin can cancel any)
+- **Response**: Returns updated order with status "cancelled"
+
+### Request Refund
+- **URL**: `/api/orders/:id/request-refund`
+- **Method**: `PUT`
+- **Authentication**: Required (customer only)
+- **Request Body**:
+  ```json
+  {
+    "reason": "Item damaged",
+    "notes": "Additional details" // Optional
+  }
+  ```
+- **Response**: Returns updated order with status "refund_requested"
+
+### Process Refund (Admin Only)
+- **URL**: `/api/orders/:id/process-refund`
+- **Method**: `PUT`
+- **Authentication**: Admin only
+- **Request Body**:
+  ```json
+  {
+    "approved": true,
+    "adminNotes": "Refund approved",
+    "restoreStock": true,
+    "reason": "Refund approved due to damaged item" // Only if denied
+  }
+  ```
+- **Response**: Returns updated order with refund status
+
+### Get All Orders (Admin Only)
+- **URL**: `/api/orders`
+- **Method**: `GET`
+- **Authentication**: Admin only
+- **Response**: Returns list of all orders
+
+## Promotion APIs (Admin Only)
+
+### Get All Promotions
+- **URL**: `/api/promotions`
+- **Method**: `GET`
+- **Authentication**: Admin only
+- **Response**: Returns list of all promotions
+
+### Create Promotion
+- **URL**: `/api/promotions`
+- **Method**: `POST`
+- **Authentication**: Admin only
+- **Request Body**:
+  ```json
+  {
+    "code": "SUMMER2025",
+    "name": "Summer Sale",
+    "description": "Get 15% off your purchase",
+    "type": "percentage", // percentage, fixed, or freeShipping
+    "discount": 15,
+    "minPurchase": 50,
+    "expiryDate": "2025-08-31T23:59:59.999Z",
+    "maxUses": 1000, // Optional
+    "applicableProducts": [] // Optional product IDs array
+  }
+  ```
+- **Response**: Returns created promotion details
+
+### Delete Promotion
+- **URL**: `/api/promotions/:id`
+- **Method**: `DELETE`
+- **Authentication**: Admin only
+- **Response**: Success message
+
+
+
+## Authentication & Authorization
+
+- JWT tokens expire after a set period, so you may need to refresh them
+- Role-based access control:
+  - Public endpoints can be accessed by anyone
+  - Private endpoints require a valid token
+  - Admin-only endpoints require a valid token with role="admin"
