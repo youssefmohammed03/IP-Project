@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg my-3">
+        <div class="container-fluid mx-5">
+            <a class="navbar-brand" href="#"><img src="assets/LOGO.svg" alt=""></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Shop</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">On Sale</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">New Arrivals</a>
+                    </li>
+                    <form class="d-flex" role="search">
+                        <input id="nav-search" class="form-control me-2" type="search"
+                            placeholder="Search for Products..." aria-label="Search">
+                        <button class="btn btn-outline-dark rounded-5" onclick="window.open(`products.html?query=${document.getElementById('nav-search').value}`, '_blank');">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </form>
+                </ul>
+            </div>
+            <a href="" class="mx-3 text-dark"><i class="bi bi-cart4"></i></a>
+            <a href="" class="mx-3 text-dark"><i class="bi bi-person-circle"></i></a>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row align-items-start justify-content-center gap-2">
+            <div id="filters" class="collapse d-md-block col-10 col-md-3 col-xl-2 border rounded-5">
+                <div class="row pt-3 justify-content-between">
+                    <div class="col-auto">
+                        <h1 class="title fs-3">Filters</h1>
+                    </div>
+                    <div class="col-auto pe-4">
+                        <i class="bi bi-filter fs-3" onclick="closeFilters()"></i>
+                    </div>
+                    <hr>
+                </div>
+                <div class="row">
+                    <h1 class="title fs-3">Pricing</h1>
+                    <label for="Min-Price" class="form-label">Min Price: 0</label>
+                    <input type="range" class="form-range px-3" min="0" max="5000" value="0" id="Min-Price" oninput="setLabelValue(this);updateFilters(this);">
+                    <label for="Max-Price" class="form-label">Max Price: 5000</label>
+                    <input type="range" class="form-range p-3" min="0" max="5000" value="5000" id="Max-Price" oninput="setLabelValue(this);updateFilters(this);">
+                    <hr>
+                </div>
+                <div class="row gap-2">
+                    <h1 class="title fs-3">Size</h1>
+                    <div class="col-auto px-1">
+                        <input type="checkbox" class="btn-check" id="xxsmall-size" autocomplete="off" onclick="updateFilters(this);">
+                        <label class="btn btn-outline-dark rounded-5" for="xxsmall-size">XX&#8209;Small</label>
+                    </div>
+                    <div class="col-auto px-1">
+                        <input type="checkbox" class="btn-check" id="xsmall-size" autocomplete="off" onclick="updateFilters(this);">
+                        <label class="btn btn-outline-dark rounded-5" for="xsmall-size">X&#8209;Small</label>
+                    </div>
+                    <div class="col-auto px-1">
+                        <input type="checkbox" class="btn-check" id="small-size" autocomplete="off" onclick="updateFilters(this);">
+                        <label class="btn btn-outline-dark rounded-5" for="small-size">Small</label>
+                    </div>
+                    <div class="col-auto px-1">
+                        <input type="checkbox" class="btn-check" id="medium-size" autocomplete="off" onclick="updateFilters(this);">
+                        <label class="btn btn-outline-dark rounded-5" for="medium-size">Medium</label>
+                    </div>
+                    <div class="col-auto px-1">
+                        <input type="checkbox" class="btn-check" id="large-size" autocomplete="off" onclick="updateFilters(this);">
+                        <label class="btn btn-outline-dark rounded-5" for="large-size">Large</label>
+                    </div>
+                    <div class="col-auto px-1">
+                        <input type="checkbox" class="btn-check" id="xlarge-size" autocomplete="off" onclick="updateFilters(this);">
+                        <label class="btn btn-outline-dark rounded-5" for="xlarge-size">X&#8209;Large</label>
+                    </div>
+                    <div class="col-auto px-1">
+                        <input type="checkbox" class="btn-check" id="xxlarge-size" autocomplete="off" onclick="updateFilters(this);">
+                        <label class="btn btn-outline-dark rounded-5" for="xxlarge-size">XX&#8209;Large</label>
+                    </div>
+                    <div class="col-auto px-1">
+                        <input type="checkbox" class="btn-check" id="xxxlarge-size" autocomplete="off" onclick="updateFilters(this);">
+                        <label class="btn btn-outline-dark rounded-5" for="xxxlarge-size">3X&#8209;Large</label>
+                    </div>
+                    <hr>
+                </div>
+                <div class="row">
+                    <h1 class="title fs-3">Dress Style</h1>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="form-check-label" for="casual-style">Casual</label>
+                        <input class="form-check-input" type="checkbox" value="" id="casual-style" onclick="updateFilters(this);">
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="form-check-label" for="formal-style">Formal</label>
+                        <input class="form-check-input" type="checkbox" value="" id="formal-style" onclick="updateFilters(this);">
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="form-check-label" for="party-style">Party</label>
+                        <input class="form-check-input" type="checkbox" value="" id="party-style" onclick="updateFilters(this);">
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="form-check-label" for="gym-style">Gym</label>
+                        <input class="form-check-input" type="checkbox" value="" id="gym-style" onclick="updateFilters(this);">
+                    </div>
+                    <hr>
+                </div>
+                <div class="row pb-3">
+                    <h1>Rating</h1>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="form-check-label" for="5star-rate">
+                            <i class="text-warning bi bi-star-fill"></i>
+                            <i class="text-warning bi bi-star-fill"></i>
+                            <i class="text-warning bi bi-star-fill"></i>
+                            <i class="text-warning bi bi-star-fill"></i>
+                            <i class="text-warning bi bi-star-fill"></i>
+                        </label>
+                        <input class="form-check-input" name="rating-radio" type="radio" value="5" id="5star-rate" onclick="updateFilters(this);">
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="form-check-label" for="4star-rate">
+                            <i class="text-warning bi bi-star-fill"></i>
+                            <i class="text-warning bi bi-star-fill"></i>
+                            <i class="text-warning bi bi-star-fill"></i>
+                            <i class="text-warning bi bi-star-fill"></i>
+                        </label>
+                        <input class="form-check-input" name="rating-radio" type="radio" value="4" id="4star-rate" onclick="updateFilters(this);">
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="form-check-label" for="3star-rate">
+                            <i class="text-warning bi bi-star-fill"></i>
+                            <i class="text-warning bi bi-star-fill"></i>
+                            <i class="text-warning bi bi-star-fill"></i>
+                        </label>
+                        <input class="form-check-input" name="rating-radio" type="radio" value="3" id="3star-rate" onclick="updateFilters(this);">
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="form-check-label" for="2star-rate">
+                            <i class="text-warning bi bi-star-fill"></i>
+                            <i class="text-warning bi bi-star-fill"></i>
+                        </label>
+                        <input class="form-check-input" name="rating-radio" type="radio" value="2" id="2star-rate" onclick="updateFilters(this);">
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="form-check-label" for="1star-rate">
+                            <i class="text-warning bi bi-star-fill"></i>
+                        </label>
+                        <input class="form-check-input" name="rating-radio" type="radio" value="1" id="1star-rate" onclick="updateFilters(this);">
+                    </div>
+                </div>
+            </div>
+            <div id="products" class="col-10 col-md-7 border rounded-5">
+                <div class="row pt-3 justify-content-between">
+                    <div class="col-auto">
+                        <h1 id="products-title" class="title fs-3">Products</h1>
+                    </div>
+                    <div class="col-auto pe-4">
+                        <button class="btn btn-outline-dark rounded-5"  data-bs-toggle="collapse" data-bs-target="#filters"><i class="bi bi-filter"></i></button>
+                    </div>
+                    <hr>
+                </div>
+                
+                <div id="products-body" class="row"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer" class="container-fluid my-4 py-4 justify-content-center">
+        <div id="news-letter"
+            class="row rounded-5 align-items-center justify-content-center mw-90 w-75 m-auto py-4 py-md-0">
+            <div class="col-10 col-md-6 rounded-5 pb-4 py-md-4">
+                <h2 class="title display-7">STAY UPTO DATE ABOUT OUR LATEST OFFERS</h2>
+            </div>
+            <div class="col-8 col-md-4">
+                <form>
+                    <div class="mb-3">
+                        <input type="email" class="form-control rounded-5" id="InputEmail1"
+                            placeholder="Enter your email">
+                    </div>
+                    <button type="submit" class="btn btn-light rounded-5 w-100">Subscribe to Newsletter</button>
+                </form>
+            </div>
+        </div>
+        <div id="footer-links" class="row gap-2 justify-content-center">
+            <div class="col-md-3">
+                <img src="assets/LOGO.svg" alt="" class="img-fluid mb-3">
+                <p class="text-wrapper">We have clothes that suits your style and which you're proud to wear. From women
+                    to men.</p>
+                <a class="btn btn-light" href=""><i class="bi bi-twitter-x"></i></a>
+                <a class="btn btn-light" href=""><i class="bi bi-facebook"></i></a>
+                <a class="btn btn-light" href=""><i class="bi bi-instagram"></i></a>
+                <a class="btn btn-light" href=""><i class="bi bi-github"></i></a>
+            </div>
+            <div class="col-md-2">
+                <h4>Company</h4>
+                <a class="d-block">About</a>
+                <a class="d-block">Features</a>
+                <a class="d-block">Work</a>
+                <a class="d-block">Career</a>
+            </div>
+            <div class="col-md-2">
+                <h4>Help</h4>
+                <a class="d-block">Customer Support</a>
+                <a class="d-block">Delivery Details</a>
+                <a class="d-block">Terms & Conditions</a>
+                <a class="d-block">Privacy Policy</a>
+            </div>
+            <div class="col-md-2">
+                <h4>FAQ</h4>
+                <a class="d-block">Account</a>
+                <a class="d-block">Manage Deliveries</a>
+                <a class="d-block">Orders</a>
+                <a class="d-block">Payment</a>
+            </div>
+            <div class="col-md-2">
+                <h4>Resources</h4>
+                <a class="d-block">Free eBooks</a>
+                <a class="d-block">Development Tutorial</a>
+                <a class="d-block">How To - Blog</a>
+                <a class="d-block">Youtube PLaylist</a>
+            </div>
+            <hr>
+        </div>
+        <div id="copyright" class="row justify-content-center">
+            <div class="col-auto">
+                <p class="text-wrapper">© 2020-2025 SHOP.CO. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/products.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
+        crossorigin="anonymous"></script>
+</body>
+</html>

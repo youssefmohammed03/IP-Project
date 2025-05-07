@@ -1,0 +1,119 @@
+#nav-search{
+    background-color: #F0F0F0;
+    border-radius: 20px;
+}
+
+#home-banner{
+    background-color: #F2F0F1;
+}
+
+.title{
+    font-weight: 700;
+    letter-spacing: -1px;
+}
+
+.text-wrapper {
+    font-weight: 400;
+    font-size: 16px;
+    letter-spacing: 0;
+    line-height: 22px;
+}
+
+#shop-now{
+    border-radius: 25px;
+}
+
+#brands{
+    background-color: black;
+}
+
+#brands img{
+    @media screen and (max-width: 640px) {
+        width: 100px
+    }
+}
+
+.hover-card:hover{
+    box-shadow: 0px 0px 10px 0px #0000001a;
+    cursor: pointer;
+}
+
+.scroll-container{
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    justify-content: center;
+}
+
+#dress-styles{
+    background-color: #F0F0F0;
+    justify-self: center;
+}
+
+.mw-90{
+    @media screen and (max-width: 640px) {
+        width: 90% !important;
+        justify-self: center;
+    }
+}
+
+.p-relative{
+    position: relative;
+}
+
+.p-absolute{
+    position: absolute;
+}
+
+.style-title{
+    top: 15px;
+    left: 25px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    font-size: 25px;
+}
+
+#dress-styles img{
+    @media screen and (max-width: 640px) {
+        width: 310px
+    }
+}
+
+#footer{
+    background-color: #F0F0F0;
+    transform: translate(0%, 20%);
+}
+
+#news-letter{
+    background-color: black;
+    color: white;
+    transform: translate(0%, -60%);
+}
+
+#footer-links{
+    transform: translate(0%, -30%);
+    @media screen and (max-width: 640px) {
+        transform: translate(0%, -15%);
+    }
+}
+
+#footer-links .d-block{
+    text-decoration: underline;
+    color: gray;
+    cursor: pointer;
+    @media screen and (max-width: 640px) {
+        display: inline !important;
+        margin: 0 10px;
+    }
+}
+
+#copyright{
+    transform: translate(0%, -100%);
+}
+
+#login{
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../assets/login-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
