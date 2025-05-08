@@ -277,164 +277,80 @@ export const ordersList = [
     }
 ];
 
-// API base URL
-export const API_BASE_URL = '/api';
-
-// Function to fetch products from API
 export async function fetchProducts() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/products`);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch products: ${response.status}`);
-        }
-        const data = await response.json();
-        return data.products || [];
-    } catch (error) {
-        console.error('Error fetching products:', error);
-        return []; // Return empty array in case of error
-    }
+    return productsList;
 }
 
-// Function to fetch a single product by ID
 export async function fetchProductById(id) {
-    try {
-        const response = await fetch(`${API_BASE_URL}/products/${id}`);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch product: ${response.status}`);
-        }
-        const product = await response.json();
-        return product;
-    } catch (error) {
-        console.error(`Error fetching product with ID ${id}:`, error);
+    console.log(id);
+    const product = productsList.find((product) => product._id == id);
+    if (!product) {
         throw new Error("Product not found");
     }
+    return product;
 }
 
 export function filterProducts(productsList, filters) {
     let filteredProducts = productsList.filter((product) => {
-        // Filter by price
-        const price = product.price;
+
+        const price = parseInt(product.price.slice(1));
         if (filters.minPrice > price || filters.maxPrice < price) {
             return false;
         }
 
-        // Filter by sizes
-        let sizeMatch = true;
-        let hasSizeFilter = false;
-
         for (let size in filters.sizes) {
-            if (filters.sizes[size]) {
-                hasSizeFilter = true;
-                if (!product.availableSizes.includes(size)) {
-                    sizeMatch = false;
-                    break;
-                }
+            if (filters.sizes[size] && !product.availableSizes.includes(size)) {
+                return false;
             }
         }
-
-        if (hasSizeFilter && !sizeMatch) {
-            return false;
-        }
-
-        // Filter by styles/categories
-        let styleMatch = true;
-        let hasStyleFilter = false;
 
         for (let style in filters.styles) {
-            if (filters.styles[style]) {
-                hasStyleFilter = true;
-                if (!product.categories.includes(style)) {
-                    styleMatch = false;
-                    break;
-                }
+            if (filters.styles[style] && !product.categories.includes(style)) {
+                return false;
             }
         }
 
-        if (hasStyleFilter && !styleMatch) {
-            return false;
-        }
-
-        // Filter by rating
         if (filters.rating > product.rating) {
             return false;
         }
 
         return true;
     });
-
     return filteredProducts;
 }
 
-export async function specialSearchProducts(productsList, searchTerm) {
-    try {
-        if (searchTerm.toLowerCase() === "new") {
-            // Fetch newest products (sort by creation date)
-            const response = await fetch(`${API_BASE_URL}/products?sort=createdAt:desc&limit=10`);
-            if (!response.ok) throw new Error('Failed to fetch new products');
-            const data = await response.json();
-            return data.products || [];
-        }
+export function specialSearchProducts(productsList, searchTerm) {
 
-        if (searchTerm.toLowerCase() === "sale") {
-            // Fetch products with discount
-            const response = await fetch(`${API_BASE_URL}/products?discount=true`);
-            if (!response.ok) throw new Error('Failed to fetch sale products');
-            const data = await response.json();
-            return data.products || [];
-        }
-
-        if (searchTerm.toLowerCase() === "all") {
-            // Fetch all products
-            const response = await fetch(`${API_BASE_URL}/products`);
-            if (!response.ok) throw new Error('Failed to fetch all products');
-            const data = await response.json();
-            return data.products || [];
-        }
-
-        return productsList;
-    } catch (error) {
-        console.error('Error in specialSearchProducts:', error);
-        return productsList;
+    if (searchTerm.toLowerCase() == "new") {
+        return productsList.sort((a, b) => {
+            return new Date(b.arrivalDate) - new Date(a.arrivalDate);
+        }).slice(0, 10);
     }
-}
 
-export async function keyFilterProducts(productsList, keyFilter) {
-    try {
-        const [key, value] = keyFilter.split("-");
-
-        if (key === "categories") {
-            // Filter by category
-            const response = await fetch(`${API_BASE_URL}/products?category=${value}`);
-            if (!response.ok) throw new Error('Failed to fetch products by category');
-            const data = await response.json();
-            return data.products || [];
-        }
-
-        // For other keys, filter locally
+    if (searchTerm.toLowerCase() == "sale") {
         return productsList.filter((product) => {
-            return product[key] &&
-                (Array.isArray(product[key]) ?
-                    product[key].includes(value) :
-                    product[key] === value);
-        });
-    } catch (error) {
-        console.error('Error in keyFilterProducts:', error);
-        return productsList;
-    }
-}
-
-export async function searchProducts(productsList, searchTerm) {
-    try {
-        // Use the backend's text search capability
-        const response = await fetch(`${API_BASE_URL}/products?search=${encodeURIComponent(searchTerm)}`);
-        if (!response.ok) throw new Error('Failed to search products');
-        const data = await response.json();
-        return data.products || [];
-    } catch (error) {
-        console.error('Error searching products:', error);
-        // Fallback to client-side filtering if API fails
-        return productsList.filter((product) => {
-            return product.name.toLowerCase().includes(searchTerm.toLowerCase());
+            return product.discount > 0;
+        }).sort((a, b) => {
+            return new Date(a.id) - new Date(b.id);
         });
     }
+
+    if (searchTerm.toLowerCase() == "all") {
+        return productsList;
+    }
+
+    return [];
+}
+
+export function keyFilterProducts(productsList, keyFilter) {
+    let [key, value] = keyFilter.split("-");
+    return productsList.filter((product) => {
+        return product[key].includes(value);
+    })
+}
+
+export function searchProducts(productsList, searchTerm) {
+    return productsList.filter((product) => {
+        return product.name.toLowerCase().includes(searchTerm.toLowerCase());
+    });
 }
