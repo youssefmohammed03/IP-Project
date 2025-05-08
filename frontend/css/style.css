@@ -51,6 +51,7 @@
 }
 
 .mw-90{
+    max-width: 940px;
     @media screen and (max-width: 640px) {
         width: 90% !important;
         justify-self: center;
@@ -116,4 +117,12 @@
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+}
+
+.product-cell{
+    background-color: inherit !important;
+}
+
+.order-cell{
+    background-color: inherit !important;
 }
