@@ -103,7 +103,7 @@ const validateProduct = (req, res, next) => {
             errors.push('Available sizes must be an array');
         } else {
             // Check that all sizes are valid
-            const validSizes = ['small', 'medium', 'large', 'xlarge', 'xxlarge', 'xxxlarge'];
+            const validSizes = ['xxsmall', 'xsmall', 'small', 'medium', 'large', 'xlarge', 'xxlarge', 'xxxlarge'];
             const invalidSizes = availableSizes.filter(size =>
                 typeof size !== 'string' || !validSizes.includes(size.toLowerCase())
             );
@@ -172,7 +172,7 @@ const validateProductUpdate = (req, res, next) => {
             errors.push('Available sizes must be an array');
         } else {
             // Check that all sizes are valid
-            const validSizes = ['small', 'medium', 'large', 'xlarge', 'xxlarge', 'xxxlarge'];
+            const validSizes = ['xxsmall', 'xsmall', 'small', 'medium', 'large', 'xlarge', 'xxlarge', 'xxxlarge'];
             const invalidSizes = availableSizes.filter(size =>
                 typeof size !== 'string' || !validSizes.includes(size.toLowerCase())
             );
