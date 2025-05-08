@@ -26,6 +26,7 @@ const PORT = config.PORT;
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'frontend'));
+app.use(express.static('frontend'));
 
 // Middleware
 app.use(cors()); // Enable CORS for all routes
