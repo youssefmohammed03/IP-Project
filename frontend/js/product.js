@@ -1,12 +1,12 @@
 import { fetchProductById } from './utils.js';
 
 const params = new URLSearchParams(window.location.search);
-const productID = params.get('id'); 
+const productID = params.get('id');
 const product = await fetchProductById(productID);
 
 console.log(product);
 
-function ProductBodyBuilder(){
+function ProductBodyBuilder() {
     let container = document.getElementById('product-body');
     container.innerHTML = '';
 
@@ -16,10 +16,9 @@ function ProductBodyBuilder(){
 
     let col = document.createElement('div');
     col.className = 'col-10 col-md-auto d-flex justify-content-center align-items-center';
-    row.appendChild(col);
-
-    let img = document.createElement('img');
-    img.src = product.imgPath;
+    row.appendChild(col); let img = document.createElement('img');
+    img.src = product.imagePath || './assets/Products/missing.png';
+    img.setAttribute("onerror", "this.src='./assets/Products/missing.png';this.setAttribute('onerror', '');");
     img.className = 'img-fluid rounded-5 h-md-75 my-4';
     img.id = 'product-image';
     col.appendChild(img);
@@ -42,7 +41,7 @@ function ProductBodyBuilder(){
     div.className = 'col-11';
     col.appendChild(div);
 
-    for (let i = 0; i < product.rating; i++){
+    for (let i = 0; i < product.rating; i++) {
         let i = document.createElement('i');
         i.className = 'bi bi-star-fill text-warning';
         div.appendChild(i);
@@ -60,20 +59,19 @@ function ProductBodyBuilder(){
 
     let h2 = document.createElement('h2');
     h2.className = 'title fs-4';
-    div.appendChild(h2);
+    div.appendChild(h2); if (product.discount <= 0) {
+        let span = document.createElement('span');
+        span.textContent = `$${product.price.toFixed(2)}`;
+        h2.appendChild(span);
+    } else {
+        let span = document.createElement('span');
+        const discountedPrice = product.finalPrice || (product.price * (1 - product.discount / 100));
+        span.textContent = `$${discountedPrice.toFixed(2)} `;
+        h2.appendChild(span);
 
-    if (product.discount <= 0) {
-        let span = document.createElement('span');
-        span.textContent = `${product.price}`;
-        h2.appendChild(span);
-    }else {
-        let span = document.createElement('span');
-        span.textContent = `$${(parseInt(product.price.slice(1)) * (1 - product.discount)).toFixed(0)} `;
-        h2.appendChild(span);
-        
         span = document.createElement('span');
         span.className = 'text-decoration-line-through text-secondary';
-        span.textContent = ` ${product.price}`;
+        span.textContent = `$${product.price.toFixed(2)}`;
         h2.appendChild(span);
     }
 
@@ -88,7 +86,7 @@ function ProductBodyBuilder(){
 
     let hr = document.createElement('hr');
     col.appendChild(hr);
-    
+
     div = document.createElement('div');
     div.className = 'col-11';
     col.appendChild(div);
@@ -96,28 +94,35 @@ function ProductBodyBuilder(){
     h2 = document.createElement('h2');
     h2.className = 'small text-secondary';
     h2.textContent = 'Select Size';
-    div.appendChild(h2);
-
-    div = document.createElement('div');
+    div.appendChild(h2); div = document.createElement('div');
     div.className = 'd-flex gap-2';
     col.appendChild(div);
 
-    product.availableSizes.forEach(size => {
-        let input = document.createElement('input');
-        input.type = 'radio';
-        input.className = 'btn-check';
-        input.name = 'size';
-        input.id = size;
-        input.value = size;
+    // Check if the product has available sizes
+    if (product.availableSizes && product.availableSizes.length > 0) {
+        product.availableSizes.forEach(size => {
+            let input = document.createElement('input');
+            input.type = 'radio';
+            input.className = 'btn-check';
+            input.name = 'size';
+            input.id = size;
+            input.value = size;
 
-        let label = document.createElement('label');
-        label.className = 'btn btn-outline-dark rounded-5';
-        label.htmlFor = size;
-        label.textContent = size;
-        
-        div.appendChild(input);
-        div.appendChild(label);
-    });
+            let label = document.createElement('label');
+            label.className = 'btn btn-outline-dark rounded-5';
+            label.htmlFor = size;
+            label.textContent = size;
+
+            div.appendChild(input);
+            div.appendChild(label);
+        });
+    } else {
+        // Display a message if no sizes are available
+        let noSizesMsg = document.createElement('p');
+        noSizesMsg.className = 'text-muted';
+        noSizesMsg.textContent = 'No sizes available';
+        div.appendChild(noSizesMsg);
+    }
 
     hr = document.createElement('hr');
     col.appendChild(hr);
@@ -134,7 +139,7 @@ function ProductBodyBuilder(){
     row = document.createElement('div');
     row.className = 'row';
     col.appendChild(row);
-    
+
     div = document.createElement('div');
     div.className = 'col-5';
     row.appendChild(div);
@@ -166,7 +171,7 @@ function ProductBodyBuilder(){
         if (quantity > 1) {
             document.getElementById('quantity').textContent = quantity - 1;
         }
-    } 
+    }
     div2.appendChild(button);
 
     div = document.createElement('div');
