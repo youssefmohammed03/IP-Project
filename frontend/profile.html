@@ -84,10 +84,7 @@
             <label class="form-label text-secondary">Email Address</label>
             <input id="user-email" type="email" class="form-control-plaintext ps-3 py-2 bg-light rounded" readonly>
           </div>
-          <div class="mb-3">
-            <label class="form-label text-secondary">Phone Number</label>
-            <input id="user-phone" type="tel" class="form-control-plaintext ps-3 py-2 bg-light rounded" readonly>
-          </div>
+          
         </div>
 
 
@@ -111,7 +108,7 @@
         document.getElementById('user-full-name').textContent = data.name;
         document.getElementById('user-name').value = data.name;
         document.getElementById('user-email').value = data.email;
-        document.getElementById('user-phone').value = data.phone;
+        
       })
       .catch(error => {
         console.error('Error:', error);
