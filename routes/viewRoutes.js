@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const path = require('path');
+const auth = require('../middleware/auth');
+const checkRole = require('../middleware/checkRole');
 
 // Helper function to serve HTML files
 const serveHtmlFile = (fileName) => {
@@ -31,7 +33,7 @@ router.get('/checkout', serveHtmlFile('checkout.html'));
 router.get('/orders', serveHtmlFile('orders.html'));
 
 // User profile page
-router.get('/profile', serveHtmlFile('profile.html'));
+router.get('/profile', auth, serveHtmlFile('profile.html'));
 
 // Dashboard page (likely admin only)
 router.get('/dashboard', serveHtmlFile('dashboard.html'));

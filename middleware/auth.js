@@ -22,7 +22,9 @@ const auth = (req, res, next) => {
         }
 
         if (!token) {
-            return res.status(401).json({ message: 'No token, authorization denied' });
+            res.redirect('/login');
+            return;
+
         }
 
         // Verify token
@@ -41,10 +43,10 @@ const auth = (req, res, next) => {
     } catch (error) {
         console.error('Auth error:', error.message);
         if (error.name === 'TokenExpiredError') {
-            return res.status(401).json({ message: 'Token has expired' });
+            res.redirect('/login');
         }
-    res.status(401).json({ message: 'Token is not valid' });
-  }
+        res.redirect('/login');
+    }
 };
 
 module.exports = auth;
