@@ -1,6 +1,6 @@
-import { fetchProducts, specialSearchProducts, keyFilterProducts, searchProducts } from "./utils.js";
+import { fetchProducts, specialSearchProducts, keyFilterProducts, searchProducts, filterProducts } from "./utils.js";
 
-let maxPrice = 20000;
+let maxPrice = 500;
 let minPrice = 0;
 
 let filters = {
@@ -76,6 +76,8 @@ function updateFilters(element){
             filters.rating = parseInt(element.value);
             break;
     }
+    console.log(filters);
+    productBuilder("products-body", filters);
 }
 
 function setLabelValue(element){
@@ -93,11 +95,15 @@ function closeFilters(){
     filters.classList.remove("show");
 }
 
+function applyFilters(){
+    productBuilder("products-body", filters);
+}
+
 function productBuilder(elementID, searchFilter) {
     let element = document.getElementById(elementID);
     element.innerHTML = ""; // Clear previous content
 
-    let products = productsList; // TODO: Use searchFilter
+    let products = filterProducts(productsList, searchFilter);
     const productsPerPage = 12;
     const totalPages = Math.ceil(products.length / productsPerPage);
     let currentPage = 1;
@@ -118,7 +124,7 @@ function productBuilder(elementID, searchFilter) {
         pageProducts.forEach((product) => {
             const col = document.createElement("div");
             col.className = "col-10 col-md-3 justify-content-center hover-card";
-            col.setAttribute("onclick", `window.open('product.html?id=${product.id}', '_blank');`);
+            col.setAttribute("onclick", `window.open('product.html?id=${product._id}', '_blank');`);
             row.appendChild(col);
 
             const img = document.createElement("img");
@@ -233,8 +239,9 @@ window.setLabelValue = setLabelValue;
 window.closeFilters = closeFilters;
 window.updateFilters = updateFilters;
 window.productBuilder = productBuilder;
+window.applyFilters = applyFilters;
 
-productBuilder("products-body", "");
+productBuilder("products-body", filters);
 
 document.getElementById("Min-Price").max = maxPrice;
 document.getElementById("Min-Price").min = minPrice;
