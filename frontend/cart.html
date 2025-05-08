@@ -48,6 +48,40 @@
 
     <!-- end of nav -->
 
+    <body>
+        <div class="container my-4">
+      
+          <!-- Product List -->
+          <div class="row" id="product-list">
+            <!-- JS will populate products here -->
+          </div>
+      
+          <hr class="my-4 border-light"/>
+      
+          <!-- Cart Section -->
+          <h3>Cart</h3>
+          <table class="table table-dark table-bordered">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Price ($)</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="cart-body">
+              <!-- Cart items go here -->
+            </tbody>
+          </table>
+          <h4>Total: $<span id="total">0</span></h4>
+          <button class="btn btn-success mt-3" href="checkout.html">Checkout</button>
+        </div>
+    </body>
+
+    <script src="js/cart.js"></script>
+
+
+
+
 
     <script type="module" src="js/main.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
