@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SHOP.CO</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg my-3">
+      <div class="container-fluid mx-5">
+          <a class="navbar-brand" href="#"><img src="assets/LOGO.svg" alt=""></a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+              data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+              aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                  <li class="nav-item">
+                      <a class="nav-link" href="#">Shop</a>
+                  </li>
+                  <li class="nav-item">
+                      <a class="nav-link" href="#">On Sale</a>
+                  </li>
+                  <li class="nav-item">
+                      <a class="nav-link" href="#">New Arrivals</a>
+                  </li>
+                  <form class="d-flex" role="search">
+                      <input id="nav-search" class="form-control me-2" type="search"
+                          placeholder="Search for Products..." aria-label="Search">
+                      <button class="btn btn-outline-dark rounded-5" onclick="window.open(`products.html?query=${document.getElementById('nav-search').value}`, '_blank');">
+                          <i class="bi bi-search"></i>
+                      </button>
+                  </form>
+              </ul>
+          </div>
+          <a href="" class="mx-3 text-dark"><i class="bi bi-cart4"></i></a>
+          <a href="" class="mx-3 text-dark"><i class="bi bi-person-circle"></i></a>
+      </div>
+  </nav>
+
+<!-- end of nav -->
+  
+
+<div class="container my-5">
+  <div class="profile-container card shadow-sm border-0 overflow-hidden">
+    <!-- Profile Header -->
+    <div class="profile-header card-header bg-light text-center py-4">
+      <div class="profile-avatar mx-auto mb-3 bg-white d-flex align-items-center justify-content-center rounded-circle" style="width: 100px; height: 100px;">
+        <i class="bi bi-person-fill fs-1 text-secondary"></i>
+      </div>
+      <h2 id="user-full-name" class="mb-1 fs-3 fw-bold">user</h2>
+      <small class="text-muted" id="user-membership">Member</small>
+    </div>
+
+    <!-- Profile Details -->
+    <div class="profile-details card-body p-4">
+      <!-- Personal Information -->
+      <div class="detail-item mb-4 pb-3 border-bottom">
+        <h5 class="text-muted mb-3 d-flex align-items-center">
+          <i class="bi bi-person me-2"></i> Personal Information
+        </h5>
+        <div class="mb-3">
+          <label class="form-label text-secondary">Name</label>
+          <input id="user-name" type="text" class="form-control-plaintext ps-3 py-2 bg-light rounded" readonly>
+        </div>
+      </div>
+
+      <!-- Contact Information -->
+      <div class="detail-item">
+        <h5 class="text-muted mb-3 d-flex align-items-center">
+          <i class="bi bi-envelope me-2"></i> Contact Information
+        </h5>
+        <div class="mb-3">
+          <label class="form-label text-secondary">Email Address</label>
+          <input id="user-email" type="email" class="form-control-plaintext ps-3 py-2 bg-light rounded" readonly>
+        </div>
+        <div class="mb-3">
+          <label class="form-label text-secondary">Phone Number</label>
+          <input id="user-phone" type="tel" class="form-control-plaintext ps-3 py-2 bg-light rounded" readonly>
+        </div>
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+  <script>
+    // Fetch user profile data
+    fetch('/api/auth/me', {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer YOUR_TOKEN' // Replace YOUR_TOKEN with the actual JWT token
+      }
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch user data');
+        }
+        return response.json();
+      })
+      .then(data => {
+        // Update the HTML with the fetched data
+        document.getElementById('user-full-name').textContent = data.full_name;
+        document.getElementById('user-name').value = data.full_name;
+        document.getElementById('user-email').value = data.email;
+        document.getElementById('user-phone').value = data.phone;
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  </script>
+
+
+<!-- Footer -->
+  <div id="footer" class="container-fluid my-4 py-4 justify-content-center">
+    <div id="news-letter"
+        class="row rounded-5 align-items-center justify-content-center mw-90 w-75 m-auto py-4 py-md-0">
+        <div class="col-10 col-md-6 rounded-5 pb-4 py-md-4">
+            <h2 class="title display-7">STAY UPTO DATE ABOUT OUR LATEST OFFERS</h2>
+        </div>
+        <div class="col-8 col-md-4">
+            <form>
+                <div class="mb-3">
+                    <input type="email" class="form-control rounded-5" id="InputEmail1"
+                        placeholder="Enter your email">
+                </div>
+                <button type="submit" class="btn btn-light rounded-5 w-100">Subscribe to Newsletter</button>
+            </form>
+        </div>
+    </div>
+    <div id="footer-links" class="row gap-2 justify-content-center">
+        <div class="col-md-3">
+            <img src="assets/LOGO.svg" alt="" class="img-fluid mb-3">
+            <p class="text-wrapper">We have clothes that suits your style and which you're proud to wear. From women
+                to men.</p>
+            <a class="btn btn-light" href=""><i class="bi bi-twitter-x"></i></a>
+            <a class="btn btn-light" href=""><i class="bi bi-facebook"></i></a>
+            <a class="btn btn-light" href=""><i class="bi bi-instagram"></i></a>
+            <a class="btn btn-light" href=""><i class="bi bi-github"></i></a>
+        </div>
+        <div class="col-md-2">
+            <h4>Company</h4>
+            <a class="d-block">About</a>
+            <a class="d-block">Features</a>
+            <a class="d-block">Work</a>
+            <a class="d-block">Career</a>
+        </div>
+        <div class="col-md-2">
+            <h4>Help</h4>
+            <a class="d-block">Customer Support</a>
+            <a class="d-block">Delivery Details</a>
+            <a class="d-block">Terms & Conditions</a>
+            <a class="d-block">Privacy Policy</a>
+        </div>
+        <div class="col-md-2">
+            <h4>FAQ</h4>
+            <a class="d-block">Account</a>
+            <a class="d-block">Manage Deliveries</a>
+            <a class="d-block">Orders</a>
+            <a class="d-block">Payment</a>
+        </div>
+        <div class="col-md-2">
+            <h4>Resources</h4>
+            <a class="d-block">Free eBooks</a>
+            <a class="d-block">Development Tutorial</a>
+            <a class="d-block">How To - Blog</a>
+            <a class="d-block">Youtube PLaylist</a>
+        </div>
+        <hr>
+    </div>
+    <div id="copyright" class="row justify-content-center">
+        <div class="col-auto">
+            <p class="text-wrapper">© 2020-2025 SHOP.CO. All rights reserved.</p>
+        </div>
+    </div>
+</div>
+
+
+<script type="module" src="js/main.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
+    crossorigin="anonymous"></script>
+</body>
+
+
+</html>
+
+
+
+
+
