@@ -62,7 +62,7 @@ const validateLogin = (req, res, next) => {
 
 // Validator for product creation
 const validateProduct = (req, res, next) => {
-    const { name, description, price, category, brand, countInStock } = req.body;
+    const { name, description, price, categories, availableSizes, brand, countInStock } = req.body;
     const errors = [];
 
     // Validate name
@@ -82,9 +82,35 @@ const validateProduct = (req, res, next) => {
         errors.push('Price must be a positive number');
     }
 
-    // Validate category
-    if (!category || category.trim() === '') {
-        errors.push('Category is required');
+    // Validate categories array
+    if (!categories) {
+        errors.push('Categories are required');
+    } else if (!Array.isArray(categories)) {
+        errors.push('Categories must be an array');
+    } else if (categories.length === 0) {
+        errors.push('At least one category is required');
+    } else {
+        // Check that all categories are non-empty strings
+        const invalidCategories = categories.filter(cat => typeof cat !== 'string' || cat.trim() === '');
+        if (invalidCategories.length > 0) {
+            errors.push('All categories must be non-empty strings');
+        }
+    }
+
+    // Validate availableSizes array
+    if (availableSizes !== undefined) {
+        if (!Array.isArray(availableSizes)) {
+            errors.push('Available sizes must be an array');
+        } else {
+            // Check that all sizes are valid
+            const validSizes = ['small', 'medium', 'large', 'xlarge', 'xxlarge', 'xxxlarge'];
+            const invalidSizes = availableSizes.filter(size =>
+                typeof size !== 'string' || !validSizes.includes(size.toLowerCase())
+            );
+            if (invalidSizes.length > 0) {
+                errors.push(`All sizes must be valid: ${validSizes.join(', ')}`);
+            }
+        }
     }
 
     // Validate brand
@@ -109,7 +135,7 @@ const validateProduct = (req, res, next) => {
 
 // Validator for product updates - only validates fields that are present
 const validateProductUpdate = (req, res, next) => {
-    const { name, description, price, category, brand, countInStock } = req.body;
+    const { name, description, price, categories, availableSizes, brand, countInStock } = req.body;
     const errors = [];
 
     // Only validate fields that are provided in the update
@@ -125,8 +151,35 @@ const validateProductUpdate = (req, res, next) => {
         errors.push('Price must be a positive number');
     }
 
-    if (category !== undefined && category.trim() === '') {
-        errors.push('Category cannot be empty');
+    // Validate categories array
+    if (categories !== undefined) {
+        if (!Array.isArray(categories)) {
+            errors.push('Categories must be an array');
+        } else if (categories.length === 0) {
+            errors.push('At least one category is required');
+        } else {
+            // Check that all categories are non-empty strings
+            const invalidCategories = categories.filter(cat => typeof cat !== 'string' || cat.trim() === '');
+            if (invalidCategories.length > 0) {
+                errors.push('All categories must be non-empty strings');
+            }
+        }
+    }
+
+    // Validate availableSizes array
+    if (availableSizes !== undefined) {
+        if (!Array.isArray(availableSizes)) {
+            errors.push('Available sizes must be an array');
+        } else {
+            // Check that all sizes are valid
+            const validSizes = ['small', 'medium', 'large', 'xlarge', 'xxlarge', 'xxxlarge'];
+            const invalidSizes = availableSizes.filter(size =>
+                typeof size !== 'string' || !validSizes.includes(size.toLowerCase())
+            );
+            if (invalidSizes.length > 0) {
+                errors.push(`All sizes must be valid: ${validSizes.join(', ')}`);
+            }
+        }
     }
 
     if (brand !== undefined && brand.trim() === '') {

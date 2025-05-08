@@ -11,7 +11,8 @@ const createProduct = async (req, res) => {
             name,
             description,
             price,
-            category,
+            categories,
+            availableSizes,
             brand,
             countInStock,
             imagePath,
@@ -20,8 +21,13 @@ const createProduct = async (req, res) => {
         } = req.body;
 
         // Validate input data
-        if (!name || !description || !price || !category || !brand) {
+        if (!name || !description || !price || !categories || !brand) {
             return res.status(400).json({ message: 'Please provide all required fields' });
+        }
+
+        // Ensure categories is an array
+        if (!Array.isArray(categories) || categories.length === 0) {
+            return res.status(400).json({ message: 'Categories must be a non-empty array' });
         }
 
         // Create product
@@ -29,7 +35,8 @@ const createProduct = async (req, res) => {
             name,
             description,
             price,
-            category,
+            categories,
+            availableSizes: availableSizes || [],
             brand,
             countInStock: countInStock || 0,
             imagePath: imagePath || '/images/default-product.jpg',
@@ -51,6 +58,7 @@ const getProducts = async (req, res) => {
     try {
         const {
             category,
+            size,
             minPrice,
             maxPrice,
             search,
@@ -63,7 +71,17 @@ const getProducts = async (req, res) => {
         // Build filter object
         const filter = {};
 
-        if (category) filter.category = category;
+        // Filter by category (now supports multiple categories)
+        if (category) {
+            filter.categories = { $in: [category] };
+        }
+
+        // Filter by size
+        if (size) {
+            filter.availableSizes = { $in: [size] };
+        }
+
+        // Filter by price range
         if (minPrice && maxPrice) {
             filter.price = { $gte: parseFloat(minPrice), $lte: parseFloat(maxPrice) };
         } else if (minPrice) {
@@ -248,7 +266,6 @@ const addProductReview = async (req, res) => {
             productRating: product.rating,
             numReviews: product.numReviews
         });
-
     } catch (error) {
         console.error('Error in addProductReview:', error);
         if (error.kind === 'ObjectId') {
@@ -303,7 +320,6 @@ const applyDiscount = async (req, res) => {
         }
 
         // Save product with new discount
-        product.price = product.price * (1 - product.discount / 100); // Update price based on discount
         await product.save();
 
         // Send success response
@@ -316,10 +332,9 @@ const applyDiscount = async (req, res) => {
                 price: product.price,
                 discount: product.discount,
                 discountExpiry: product.discountExpiry,
-                finalPrice: product.price * (1 - product.discount / 100)
+                finalPrice: product.finalPrice
             }
         });
-
     } catch (error) {
         console.error('Error in applyDiscount:', error);
         if (error.kind === 'ObjectId') {

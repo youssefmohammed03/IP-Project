@@ -41,10 +41,26 @@ const productSchema = new mongoose.Schema({
         required: [true, 'Price is required'],
         min: [0, 'Price cannot be negative']
     },
-    category: {
-        type: String,
-        required: [true, 'Category is required'],
-        enum: ['electronics', 'clothing', 'books', 'home', 'beauty', 'sports', 'other']
+    categories: {
+        type: [String],
+        required: [true, 'At least one category is required'],
+        validate: {
+            validator: function (categories) {
+                return categories.length > 0;
+            },
+            message: 'At least one category is required'
+        }
+    },
+    availableSizes: {
+        type: [String],
+        default: [],
+        validate: {
+            validator: function (sizes) {
+                const validSizes = ['small', 'medium', 'large', 'xlarge', 'xxlarge', 'xxxlarge'];
+                return sizes.every(size => validSizes.includes(size.toLowerCase()));
+            },
+            message: 'Available sizes must be valid (small, medium, large, xlarge, xxlarge, xxxlarge)'
+        }
     },
     brand: {
         type: String,
@@ -97,7 +113,7 @@ const productSchema = new mongoose.Schema({
 });
 
 // Add index for faster searches
-productSchema.index({ name: 'text', description: 'text', brand: 'text', category: 'text' });
+productSchema.index({ name: 'text', description: 'text', brand: 'text', categories: 'text' });
 
 // Virtual field for final price after discount
 productSchema.virtual('finalPrice').get(function () {
