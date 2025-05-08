@@ -1,5 +1,6 @@
 // server.js
 const express = require('express');
+const path = require('path');
 const dotenv = require('dotenv');
 const config = require('./config/config');
 const connectDB = require('./config/db');
@@ -22,6 +23,9 @@ connectDB();
 
 const app = express();
 const PORT = config.PORT;
+
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'frontend'));
 
 // Middleware
 app.use(cors()); // Enable CORS for all routes
