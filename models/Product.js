@@ -56,10 +56,10 @@ const productSchema = new mongoose.Schema({
         default: [],
         validate: {
             validator: function (sizes) {
-                const validSizes = ['small', 'medium', 'large', 'xlarge', 'xxlarge', 'xxxlarge'];
+                const validSizes = ['xxsmall', 'xsmall', 'small', 'medium', 'large', 'xlarge', 'xxlarge', 'xxxlarge'];
                 return sizes.every(size => validSizes.includes(size.toLowerCase()));
             },
-            message: 'Available sizes must be valid (small, medium, large, xlarge, xxlarge, xxxlarge)'
+            message: 'Available sizes must be valid (xxsmall, xsmall, small, medium, large, xlarge, xxlarge, xxxlarge)'
         }
     },
     brand: {
