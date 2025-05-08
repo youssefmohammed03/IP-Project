@@ -14,6 +14,7 @@ const productRoutes = require('./routes/productRoutes');
 const cartRoutes = require('./routes/cartRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const promotionRoutes = require('./routes/promotionRoutes');
+const viewRoutes = require('./routes/viewRoutes');
 
 // Load environment variables from .env file
 dotenv.config();
@@ -39,17 +40,15 @@ if (process.env.NODE_ENV !== 'production') {
     app.use(morgan('dev'));
 }
 
-// Routes
+// API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/promotions', promotionRoutes);
 
-// Basic route
-app.get('/', (req, res) => {
-    res.status(200).send('E-commerce API is running...');
-});
+// View Routes - these route HTML pages
+app.use('/', viewRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
