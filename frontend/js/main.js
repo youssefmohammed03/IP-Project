@@ -44,7 +44,7 @@ function productConainerBuilder(elementID, searchFilter, number) {
         
         let img = document.createElement("img");
         img.src = product.imgPath;
-        img.setAttribute("onerror", "this.src='../assets/Products/missing.png';this.setAttribute('onerror', '');");
+        img.setAttribute("onerror", "this.src='./assets/Products/missing.png';this.setAttribute('onerror', '');");
         img.className = "img-fluid rounded my-2";
         img.style.width = "240px";
         img.style.height = "240px";

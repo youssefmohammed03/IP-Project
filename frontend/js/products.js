@@ -129,7 +129,7 @@ function productBuilder(elementID, searchFilter) {
 
             const img = document.createElement("img");
             img.src = product.imgPath;
-            img.setAttribute("onerror", "this.src='../assets/Products/missing.png';this.setAttribute('onerror', '');");
+            img.setAttribute("onerror", "this.src='./assets/Products/missing.png';this.setAttribute('onerror', '');");
             img.className = "img-fluid rounded my-2";
             img.style.aspectRatio = "1/1";
             col.appendChild(img);
