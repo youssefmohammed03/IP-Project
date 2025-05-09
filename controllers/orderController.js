@@ -155,82 +155,6 @@ const getOrderById = async (req, res) => {
   }
 };
 
-// @desc    Update order to paid (Admin only)
-// @route   PUT /api/orders/:id/pay
-// @access  Private/Admin
-const updateOrderToPaid = async (req, res) => {
-  try {
-    const order = await Order.findById(req.params.id);
-
-    // Check if order exists
-    if (!order) {
-      return res.status(404).json({ message: 'Order not found' });
-    }
-
-    // Update order payment status
-    order.isPaid = true;
-    order.paidAt = Date.now();
-    order.paymentResult = {
-      id: Date.now().toString(),
-      status: 'COMPLETED',
-      update_time: new Date().toISOString(),
-      email_address: 'admin@example.com'
-    };
-
-    // Update order status to processing once paid
-    order.status = 'processing';
-
-    const updatedOrder = await order.save();
-    res.status(200).json(updatedOrder);
-  } catch (error) {
-    console.error('Error in updateOrderToPaid:', error);
-    if (error.kind === 'ObjectId') {
-      return res.status(404).json({ message: 'Order not found - invalid ID format' });
-    }
-    res.status(500).json({ message: 'Server error', error: error.message });
-  }
-};
-
-// @desc    Update order to delivered
-// @route   PUT /api/orders/:id/deliver
-// @access  Private (Both admin and order owner)
-const updateOrderToDelivered = async (req, res) => {
-  try {
-    const order = await Order.findById(req.params.id);
-
-    // Check if order exists
-    if (!order) {
-      return res.status(404).json({ message: 'Order not found' });
-    }
-
-    // Check if the order belongs to the logged in user or user is admin
-    if (req.user.role !== 'admin' && order.user.toString() !== req.user.id) {
-      return res.status(403).json({ message: 'Not authorized to update this order' });
-    }
-
-    // Check if order is paid (can't mark unpaid orders as delivered)
-    if (!order.isPaid) {
-      return res.status(400).json({ message: 'Cannot mark unpaid order as delivered' });
-    }
-
-    // Update order delivery status
-    order.isDelivered = true;
-    order.deliveredAt = Date.now();
-
-    // Update order status to delivered
-    order.status = 'delivered';
-
-    const updatedOrder = await order.save();
-    res.status(200).json(updatedOrder);
-  } catch (error) {
-    console.error('Error in updateOrderToDelivered:', error);
-    if (error.kind === 'ObjectId') {
-      return res.status(404).json({ message: 'Order not found - invalid ID format' });
-    }
-    res.status(500).json({ message: 'Server error', error: error.message });
-  }
-};
-
 // @desc    Update order to shipped (Admin only)
 // @route   PUT /api/orders/:id/ship
 // @access  Private/Admin
@@ -241,16 +165,6 @@ const updateOrderToShipped = async (req, res) => {
     // Check if order exists
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
-    }
-
-    // Check if order is paid (can't ship unpaid orders)
-    if (!order.isPaid) {
-      return res.status(400).json({ message: 'Cannot ship unpaid order' });
-    }
-
-    // Check if order is already delivered
-    if (order.isDelivered) {
-      return res.status(400).json({ message: 'Order is already delivered' });
     }
 
     // Update order status to shipped
@@ -285,10 +199,6 @@ const cancelOrder = async (req, res) => {
       return res.status(403).json({ message: 'Not authorized to cancel this order' });
     }
 
-    // Check if order can be cancelled (e.g., not delivered yet)
-    if (order.isDelivered) {
-      return res.status(400).json({ message: 'Cannot cancel a delivered order' });
-    }
 
     // Update order status to cancelled
     order.status = 'cancelled';
@@ -331,21 +241,6 @@ const requestRefund = async (req, res) => {
       return res.status(403).json({ message: 'Not authorized to request refund for this order' });
     }
 
-    // Check if order is delivered (can only request refund for delivered orders)
-    if (!order.isDelivered) {
-      return res.status(400).json({ message: 'Cannot request refund for undelivered order' });
-    }
-
-    // Check if order is already cancelled or refunded
-    if (order.status === 'cancelled' || order.status === 'refunded') {
-      return res.status(400).json({ message: `Cannot request refund for ${order.status} order` });
-    }
-
-    // Check if refund is already requested
-    if (order.status === 'refund_requested') {
-      return res.status(400).json({ message: 'Refund already requested for this order' });
-    }
-
     // Add refund reason and notes if provided
     const { reason, notes } = req.body;
     order.refundReason = reason || 'Customer requested refund';
@@ -378,21 +273,14 @@ const processRefund = async (req, res) => {
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    // Check if refund is requested
-    if (order.status !== 'refund_requested') {
-      return res.status(400).json({ message: 'No refund requested for this order' });
-    }
-
     // Add admin notes if provided
     const { adminNotes, approved } = req.body;
 
     if (adminNotes) {
       order.adminRefundNotes = adminNotes;
-    }
-
-    // Update order status based on admin decision
+    }    // Update order status based on admin decision
     if (approved === false) {
-      order.status = 'delivered'; // Reset to delivered if refund is denied
+      order.status = 'shipped'; // Reset to shipped if refund is denied
       order.refundDeniedReason = req.body.reason || 'Refund request denied by admin';
     } else {
       // Process the refund
@@ -428,8 +316,6 @@ module.exports = {
   getOrders,
   getMyOrders,
   getOrderById,
-  updateOrderToPaid,
-  updateOrderToDelivered,
   updateOrderToShipped,
   cancelOrder,
   requestRefund,

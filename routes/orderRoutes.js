@@ -4,8 +4,6 @@ const {
     createOrder,
     getMyOrders,
     getOrderById,
-    updateOrderToPaid,
-    updateOrderToDelivered,
     updateOrderToShipped,
     cancelOrder,
     requestRefund,
@@ -31,20 +29,10 @@ router.get('/myorders', auth, getMyOrders);
 // @access  Private
 router.get('/:id', auth, getOrderById);
 
-// @route   PUT /api/orders/:id/pay
-// @desc    Update order to paid (Admin only)
-// @access  Private/Admin
-router.put('/:id/pay', auth, checkRole(['admin']), updateOrderToPaid);
-
 // @route   PUT /api/orders/:id/ship
 // @desc    Update order to shipped (Admin only)
 // @access  Private/Admin
 router.put('/:id/ship', auth, checkRole(['admin']), updateOrderToShipped);
-
-// @route   PUT /api/orders/:id/deliver
-// @desc    Update order to delivered (for both customers and admins)
-// @access  Private
-router.put('/:id/deliver', auth, updateOrderToDelivered);
 
 // @route   PUT /api/orders/:id/cancel
 // @desc    Cancel an order
