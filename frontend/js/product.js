@@ -202,7 +202,7 @@ async function addToCart() {
         const token = getCookie('token');
 
         if (!token) {
-            window.location.href = 'login.html';
+            window.location.href = 'login';
             return;
         }
 

@@ -214,7 +214,7 @@ function productBuilder(elementID, searchFilter) {
         pageProducts.forEach((product) => {
             const col = document.createElement("div");
             col.className = "col-10 col-md-3 justify-content-center hover-card";
-            col.setAttribute("onclick", `window.open('product.html?id=${product._id}', '_blank');`);
+            col.setAttribute("onclick", `window.open('product?id=${product._id}', '_blank');`);
             row.appendChild(col);
 
             const img = document.createElement("img");
