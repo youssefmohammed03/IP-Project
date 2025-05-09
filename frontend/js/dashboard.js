@@ -9,19 +9,19 @@ function initProductsTable(){
     productsList.forEach((product) => {
         const discountedPrice = product.price * (1 - product.discount/100);
         let row = document.createElement("tr");
-        if(product.stock <= 0) {
+        if(product.countInStock <= 0) {
             row.style.backgroundColor = "#ffcccc"; // Highlight row with light red color
-        }else if(product.stock < 20) {
+        }else if(product.countInStock < 20) {
             row.style.backgroundColor = "#fffccc"; // Highlight row with light red color
         }
         row.innerHTML = `<td class="product-cell">${product._id}</td>
                          <td class="product-cell">${product.name}</td>
                          <td class="product-cell">$${product.price}</td>
                          <td class="product-cell">${product.discount > 0 ? `$${discountedPrice.toFixed(2)} (${product.discount}%)` : "No Discount"}</td>
-                         <td class="product-cell">${product.stock}</td>
+                         <td class="product-cell">${product.countInStock}</td>
                          <td class="product-cell">
-                            <button class="btn btn-primary" onclick="openEditModal(${product._id})">Edit</button>
-                            <button class="btn btn-danger" onclick="deleteProduct(${product._id})">Delete</button>
+                            <button class="btn btn-primary" onclick="openEditModal('${product._id}')">Edit</button>
+                            <button class="btn btn-danger" onclick="deleteProduct('${product._id}')">Delete</button>
                          </td>`;
         tbody.appendChild(row);
     });
@@ -64,7 +64,6 @@ document.getElementById("addProductForm").addEventListener("submit", function(ev
 });
 
 function deleteProduct(productId) {
-    productId = parseInt(productId);
     productsList = productsList.filter(p => p._id !== productId);
     alert("Product deleted successfully!");
     console.log(productsList);
@@ -72,7 +71,7 @@ function deleteProduct(productId) {
 }
 
 function openEditModal(productId) {
-    productId = parseInt(productId);
+    console.log(productId);
     const product = productsList.find(p => p._id === productId);
     if (!product) {
         alert("Product not found!");
@@ -82,9 +81,9 @@ function openEditModal(productId) {
     document.getElementById("editProductId").value = product._id;
     document.getElementById("editProductName").value = product.name;
     document.getElementById("editProductPrice").value = parseFloat(product.price);
-    document.getElementById("editProductStock").value = product.stock;
+    document.getElementById("editProductStock").value = product.countInStock;
     document.getElementById("editProductCategory").value = product.categories;
-    document.getElementById("editProductImage").value = product.imgPath;
+    document.getElementById("editProductImage").value = product.imagePath;
 
     const editModal = new bootstrap.Modal(document.getElementById("editProductModal"));
     editModal.show();
@@ -108,9 +107,9 @@ function updateProduct() {
         ...productsList[productIndex],
         name: name,
         price: price,
-        stock: stock,
+        countInStock: stock,
         categories: [category],
-        imgPath: imgPath
+        imagePath: imgPath
     };
 
     alert("Product updated successfully!");
