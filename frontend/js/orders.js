@@ -1,3 +1,8 @@
+import { getCookie, makeRequest } from "./utils.js";
+
+let userToken = getCookie("token");
+let host = "http://localhost:3000";
+
 const orders = [
     {
         paymentResult: {
@@ -39,15 +44,26 @@ const orders = [
     }
 ];
 
-function populateOrdersTable() {
+async function getOrders() {
+    try {
+        const response = await makeRequest(`${host}/api/orders/myorders`, 'GET', null, userToken);
+        populateOrdersTable(response);
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+window.getOrders = getOrders;
+
+function populateOrdersTable(orders) {
     const tableBody = document.getElementById("orders-table-body");
+    tableBody.innerHTML = "";
 
     orders.forEach(order => {
         const row = document.createElement("tr");
-
+        console.log(order);
         row.innerHTML = `
             <td>${order._id}</td>
-            <td>${order.paymentResult.status}</td>
             <td>${order.paymentMethod}</td>
             <td>${order.itemsPrice.toFixed(2)}</td>
             <td>${order.shippingPrice.toFixed(2)}</td>
@@ -78,4 +94,4 @@ function requestRefund(orderId) {
 }
 
 // Populate the table on page load
-document.addEventListener("DOMContentLoaded", populateOrdersTable);
+document.addEventListener("DOMContentLoaded", getOrders);
