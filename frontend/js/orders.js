@@ -1,7 +1,6 @@
-import { getCookie, makeRequest } from "./utils.js";
+import { getCookie, makeRequest, host } from "./utils.js";
 
 let userToken = getCookie("token");
-let host = "http://localhost:3000";
 
 async function getOrders() {
     try {

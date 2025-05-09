@@ -1,9 +1,8 @@
-import { fetchProducts, fetchOrders, addAllProducts, addAllOrders, makeRequest, getCookie } from "./utils.js";
+import { fetchProducts, fetchOrders, addAllProducts, addAllOrders, makeRequest, getCookie, host } from "./utils.js";
 
 let productsList = await fetchProducts();
 let ordersList = await fetchOrders();
 let token = getCookie('token');
-let host = "http://localhost:3000";
 
 async function fetchUsers(){
     try {

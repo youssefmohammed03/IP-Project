@@ -1,4 +1,4 @@
-let host = "http://localhost:3000";
+export const host = "http://localhost:3000";
 let token = getCookie('token');
 export const envToken = token;
 
