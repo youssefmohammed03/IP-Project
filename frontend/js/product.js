@@ -171,17 +171,343 @@ function ProductBodyBuilder() {
         if (quantity > 1) {
             document.getElementById('quantity').textContent = quantity - 1;
         }
-    }
+    };
     div2.appendChild(button);
 
     div = document.createElement('div');
     div.className = 'col-7';
-    row.appendChild(div); button = document.createElement('button');
+    row.appendChild(div);
+
+    button = document.createElement('button');
     button.className = 'btn btn-dark rounded-5 w-100';
     button.textContent = 'Add to Cart';
     button.id = 'add-to-cart-btn';
     button.onclick = addToCart;
     div.appendChild(button);
+
+    // Add reviews section
+    addReviewsSection(container);
+}
+
+// Function to add the reviews section
+function addReviewsSection(container) {
+    // Create a row for reviews
+    let reviewsRow = document.createElement('div');
+    reviewsRow.className = 'row justify-content-center mt-5';
+    container.appendChild(reviewsRow);
+
+    // Create column for reviews
+    let reviewsCol = document.createElement('div');
+    reviewsCol.className = 'col-10';
+    reviewsRow.appendChild(reviewsCol);
+
+    // Add a heading for the reviews section
+    let reviewsHeading = document.createElement('h3');
+    reviewsHeading.className = 'mb-4';
+    reviewsHeading.textContent = 'Customer Reviews';
+    reviewsCol.appendChild(reviewsHeading);
+
+    // Display existing reviews if available
+    if (product.reviews && product.reviews.length > 0) {
+        let reviewsList = document.createElement('div');
+        reviewsList.className = 'reviews-list mb-4';
+        reviewsCol.appendChild(reviewsList);
+
+        product.reviews.forEach(review => {
+            let reviewCard = document.createElement('div');
+            reviewCard.className = 'card mb-3';
+
+            let cardBody = document.createElement('div');
+            cardBody.className = 'card-body';
+
+            // Review header with user name and date
+            let reviewHeader = document.createElement('div');
+            reviewHeader.className = 'd-flex justify-content-between align-items-center mb-2';
+
+            let userName = document.createElement('h5');
+            userName.className = 'card-title mb-0';
+            userName.textContent = review.name;
+
+            let reviewDate = document.createElement('small');
+            reviewDate.className = 'text-muted';
+            reviewDate.textContent = new Date(review.createdAt).toLocaleDateString();
+
+            reviewHeader.appendChild(userName);
+            reviewHeader.appendChild(reviewDate);
+            cardBody.appendChild(reviewHeader);
+
+            // Star rating
+            let ratingDiv = document.createElement('div');
+            ratingDiv.className = 'mb-2';
+
+            for (let i = 0; i < 5; i++) {
+                let star = document.createElement('i');
+                if (i < review.rating) {
+                    star.className = 'bi bi-star-fill text-warning';
+                } else {
+                    star.className = 'bi bi-star text-warning';
+                }
+                ratingDiv.appendChild(star);
+            }
+
+            let ratingText = document.createElement('span');
+            ratingText.className = 'ms-2';
+            ratingText.textContent = `${review.rating}/5`;
+            ratingDiv.appendChild(ratingText);
+
+            cardBody.appendChild(ratingDiv);
+
+            // Review comment
+            if (review.comment) {
+                let comment = document.createElement('p');
+                comment.className = 'card-text';
+                comment.textContent = review.comment;
+                cardBody.appendChild(comment);
+            }
+
+            reviewCard.appendChild(cardBody);
+            reviewsList.appendChild(reviewCard);
+        });
+    } else {
+        let noReviews = document.createElement('p');
+        noReviews.className = 'text-muted mb-4';
+        noReviews.textContent = 'No reviews yet. Be the first to review this product!';
+        reviewsCol.appendChild(noReviews);
+    }
+
+    // Add review form for logged-in users
+    addReviewForm(reviewsCol);
+}
+
+// Function to add the review submission form
+function addReviewForm(container) {
+    // Check if user is logged in
+    function getCookie(name) {
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+            const [cookieName, cookieValue] = cookie.trim().split('=');
+            if (cookieName === name) {
+                return decodeURIComponent(cookieValue);
+            }
+        }
+        return null;
+    }
+
+    const token = getCookie('token');
+
+    if (!token) {
+        // User is not logged in, show message
+        let loginMessage = document.createElement('div');
+        loginMessage.className = 'alert alert-info';
+        loginMessage.innerHTML = 'Please <a href="login">login</a> to leave a review.';
+        container.appendChild(loginMessage);
+        return;
+    }
+
+    // User is logged in, show review form
+    let reviewFormCard = document.createElement('div');
+    reviewFormCard.className = 'card';
+    container.appendChild(reviewFormCard);
+
+    let cardBody = document.createElement('div');
+    cardBody.className = 'card-body';
+    reviewFormCard.appendChild(cardBody);
+
+    let formTitle = document.createElement('h5');
+    formTitle.className = 'card-title mb-3';
+    formTitle.textContent = 'Write a Review';
+    cardBody.appendChild(formTitle);
+
+    // Rating selector
+    let ratingDiv = document.createElement('div');
+    ratingDiv.className = 'mb-3';
+
+    let ratingLabel = document.createElement('label');
+    ratingLabel.className = 'form-label';
+    ratingLabel.textContent = 'Your Rating';
+    ratingDiv.appendChild(ratingLabel);
+
+    let starsDiv = document.createElement('div');
+    starsDiv.className = 'd-flex align-items-center';
+    ratingDiv.appendChild(starsDiv);
+
+    // Create interactive star rating
+    for (let i = 1; i <= 5; i++) {
+        let starLabel = document.createElement('label');
+        starLabel.className = 'star-rating-label me-2';
+        starLabel.style.cursor = 'pointer';
+        starLabel.style.fontSize = '1.5rem';
+        starLabel.htmlFor = 'star-' + i;
+
+        let starInput = document.createElement('input');
+        starInput.type = 'radio';
+        starInput.name = 'rating';
+        starInput.value = i;
+        starInput.id = 'star-' + i;
+        starInput.style.display = 'none';
+
+        let starIcon = document.createElement('i');
+        starIcon.className = 'bi bi-star text-warning';
+        starIcon.dataset.rating = i;
+
+        // Add event listeners for hover effect
+        starLabel.addEventListener('mouseenter', function () {
+            // Fill stars up to this one
+            document.querySelectorAll('.star-rating-label i').forEach(star => {
+                if (parseInt(star.dataset.rating) <= i) {
+                    star.className = 'bi bi-star-fill text-warning';
+                } else {
+                    star.className = 'bi bi-star text-warning';
+                }
+            });
+        });
+
+        // Add event listener for click
+        starInput.addEventListener('change', function () {
+            // Update all stars based on selection
+            document.querySelectorAll('.star-rating-label i').forEach(star => {
+                if (parseInt(star.dataset.rating) <= i) {
+                    star.className = 'bi bi-star-fill text-warning';
+                } else {
+                    star.className = 'bi bi-star text-warning';
+                }
+            });
+        });
+
+        starLabel.appendChild(starInput);
+        starLabel.appendChild(starIcon);
+        starsDiv.appendChild(starLabel);
+    }
+
+    // Mouse leave event for the stars container
+    starsDiv.addEventListener('mouseleave', function () {
+        // Check which star is selected
+        const selectedStar = document.querySelector('input[name="rating"]:checked');
+        if (selectedStar) {
+            const rating = parseInt(selectedStar.value);
+            document.querySelectorAll('.star-rating-label i').forEach(star => {
+                if (parseInt(star.dataset.rating) <= rating) {
+                    star.className = 'bi bi-star-fill text-warning';
+                } else {
+                    star.className = 'bi bi-star text-warning';
+                }
+            });
+        } else {
+            // No star selected, reset all
+            document.querySelectorAll('.star-rating-label i').forEach(star => {
+                star.className = 'bi bi-star text-warning';
+            });
+        }
+    });
+
+    cardBody.appendChild(ratingDiv);
+
+    // Text area for review comment
+    let commentDiv = document.createElement('div');
+    commentDiv.className = 'mb-3';
+
+    let commentLabel = document.createElement('label');
+    commentLabel.className = 'form-label';
+    commentLabel.textContent = 'Your Review';
+    commentLabel.htmlFor = 'review-comment';
+    commentDiv.appendChild(commentLabel);
+
+    let commentTextarea = document.createElement('textarea');
+    commentTextarea.className = 'form-control';
+    commentTextarea.id = 'review-comment';
+    commentTextarea.rows = 4;
+    commentTextarea.placeholder = 'Share your experience with this product...';
+    commentDiv.appendChild(commentTextarea);
+
+    cardBody.appendChild(commentDiv);
+
+    // Submit button
+    let submitBtn = document.createElement('button');
+    submitBtn.className = 'btn btn-primary';
+    submitBtn.textContent = 'Submit Review';
+    submitBtn.id = 'submit-review-btn';
+    submitBtn.onclick = submitReview;
+    cardBody.appendChild(submitBtn);
+
+    // Error message container
+    let errorDiv = document.createElement('div');
+    errorDiv.className = 'alert alert-danger mt-3 d-none';
+    errorDiv.id = 'review-error';
+    cardBody.appendChild(errorDiv);
+}
+
+// Function to submit a review
+async function submitReview() {
+    try {
+        // Get selected rating
+        const selectedRating = document.querySelector('input[name="rating"]:checked');
+        if (!selectedRating) {
+            document.getElementById('review-error').textContent = 'Please select a rating';
+            document.getElementById('review-error').classList.remove('d-none');
+            return;
+        }
+
+        const rating = selectedRating.value;
+        const comment = document.getElementById('review-comment').value;
+
+        // Get token for auth
+        function getCookie(name) {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                const [cookieName, cookieValue] = cookie.trim().split('=');
+                if (cookieName === name) {
+                    return decodeURIComponent(cookieValue);
+                }
+            }
+            return null;
+        }
+
+        const token = getCookie('token');
+
+        // Create loading effect on button
+        const button = document.getElementById('submit-review-btn');
+        const originalText = button.textContent;
+        button.textContent = 'Submitting...';
+        button.disabled = true;
+
+        // Make API request to add review
+        const response = await fetch(`/api/products/${productID}/reviews`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                rating,
+                comment
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to submit review');
+        }
+
+        // Show success message
+        button.textContent = 'Review Submitted!';
+        button.classList.add('btn-success');
+
+        // Reload page after delay to show the new review
+        setTimeout(() => {
+            window.location.reload();
+        }, 1500);
+
+    } catch (error) {
+        console.error('Error submitting review:', error);
+
+        // Show error message
+        document.getElementById('review-error').textContent = 'Failed to submit review. Please try again.';
+        document.getElementById('review-error').classList.remove('d-none');
+
+        // Reset button
+        const button = document.getElementById('submit-review-btn');
+        button.textContent = 'Submit Review';
+        button.disabled = false;
+    }
 }
 
 // Add to cart functionality

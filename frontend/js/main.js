@@ -39,7 +39,7 @@ function productConainerBuilder(elementID, searchFilter, number) {
     products.forEach((product) => {
         let col = document.createElement("div");
         col.className = "col-auto justify-content-center hover-card";
-        col.setAttribute("onclick", `window.open('product?id=${product.id}', '_blank');`);
+        col.setAttribute("onclick", `window.open('product.html?id=${product.id}', '_blank');`);
         row.appendChild(col);
 
         let img = document.createElement("img");
