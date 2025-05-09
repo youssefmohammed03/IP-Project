@@ -241,10 +241,31 @@ export async function createOrder(order, token) {
 }
 
 
-export async function addToCart(cartItem, token) {
-    const endpoint = `${host}/api/cart`;
-    return await makeRequest(endpoint, 'POST', cartItem, token);
+export async function addToCart(itemData, token) {
+    try {
+        if (!itemData.productId || !itemData.quantity) {
+            throw new Error('Invalid product data');
+        }
 
+        const response = await fetch('/api/cart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(itemData)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to add item to cart');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Error in addToCart:', error);
+        throw error;
+    }
 }
 
 export function getCookie(name) {
