@@ -13,6 +13,7 @@ fetch('/api/auth/me', {
         document.getElementById('user-full-name').textContent = data.name;
         document.getElementById('user-name').value = data.name;
         document.getElementById('user-email').value = data.email;
+        document.getElementById('user-membership').textContent = data.role;
         
     })
     .catch(error => {

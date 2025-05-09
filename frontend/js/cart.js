@@ -25,7 +25,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       try {
         const res = await axiosAuth.get('/products');
         productList.innerHTML = '';
-        res.data.products.reverse().forEach(product => {
+        res.data.products.filter(
+          product => product.countInStock > 0
+        ).forEach(product => {
           const card = document.createElement('div');
           card.className = 'col-md-3';
           card.innerHTML = `
@@ -33,7 +35,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               <img src="${product.imagePath}" class="card-img-top" alt="${product.name}" onerror="this.src='./assets/Products/missing.png';this.setAttribute('onerror', '');">
               <div class="card-body">
                 <h5 class="card-title">${product.name}</h5>
-                <p class="card-text">$${product.price}</p>
+                <p class="card-text">$${product.discount > 0? product.price * (1 - product.discount/100) : product.price}</p>
                 <button class="btn btn-primary add-to-cart" data-id="${product._id}">Add to Cart</button>
               </div>
             </div>`;
@@ -99,13 +101,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         const country = document.getElementById('country').value;
         const paymentMethod = document.getElementById('paymentMethod').value;
         const promoCode = document.getElementById('promoCode').value;
+        const phone = document.getElementById('phone').value;
 
         const orderData = {
             shippingAddress: {
                 address,
                 city,
                 postalCode,
-                country
+                country,
+                phone
             },
             paymentMethod,
             promoCode: promoCode || undefined

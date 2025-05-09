@@ -1,7 +1,39 @@
-import { fetchProducts, fetchOrders } from "./utils.js";
+import { fetchProducts, fetchOrders, addAllProducts, addAllOrders } from "./utils.js";
 
 let productsList = await fetchProducts();
 let ordersList = await fetchOrders();
+
+async function initializeTables() {
+  if (productsList.length === 0) {
+    await addAllProducts();          
+    initProductsTable();           
+  }
+
+  if (ordersList.length === 0) {
+    await addAllOrders();             
+    initOrdersTable();
+  }
+}
+
+initializeTables();
+
+
+fetch('/api/auth/me', {
+    method: 'GET'
+}).then(response => {
+    if (!response.ok) {
+        throw new Error('Failed to fetch user data');
+    }
+    return response.json();
+}).then(data => {
+    if (data.role !== 'admin') {
+        alert('You are not authorized to access this page.');
+        window.location.href = '/';
+    }else{
+        initProductsTable();
+        initOrdersTable();
+    }
+})
 
 function initProductsTable(){
     let tbody = document.getElementById("productTableBody");
@@ -26,8 +58,6 @@ function initProductsTable(){
         tbody.appendChild(row);
     });
 }
-
-initProductsTable();
 
 document.getElementById("addProductForm").addEventListener("submit", function(event) {
     event.preventDefault();

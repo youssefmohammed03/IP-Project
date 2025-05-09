@@ -295,7 +295,13 @@ export async function fetchProducts() {
 }
 
 export async function fetchOrders() {
-    return ordersList;
+    try {
+        const res = await makeRequest(`${host}/api/orders`, 'GET', null, envToken);
+        console.log(res);
+        return res;
+    } catch (err) {
+        console.error('Error fetching orders', err);
+    }
 }
 
 export async function fetchProductById(id) {
@@ -425,6 +431,12 @@ export async function addAllProducts(){
     }
 }
 
+export async function addAllOrders(){
+    ordersList.forEach(async (order) => {
+        await createOrder(order, envToken);
+    })
+}
+
 export async function getAllOrders(token) {
     return await makeRequest(`${host}/api/orders`, 'GET', null, token);
 }
@@ -464,6 +476,32 @@ export async function createProduct(product, token) {
     const endpoint = `${host}/api/products`;
     return await makeRequest(endpoint, 'POST', body, token);
 }
+
+export async function createOrder(order, token) {
+  if (!token) {
+    throw new Error("Authentication token is required");
+  }
+
+  const body = {
+    shippingAddress: {
+      address: order.shippingAddress.address,
+      city: order.shippingAddress.city,
+      postalCode: order.shippingAddress.postalCode,
+      country: order.shippingAddress.country,
+      phone: order.shippingAddress.phone
+    },
+    paymentMethod: order.paymentMethod || 'PayPal',
+  };
+
+  // Optionally include promoCode
+  if (order.promoCode) {
+    body.promoCode = order.promoCode;
+  }
+
+  const endpoint = `${host}/api/orders`;
+  return await makeRequest(endpoint, 'POST', body, token);
+}
+
 
 export async function addToCart(cartItem, token) {
     const endpoint = `${host}/api/cart`;
