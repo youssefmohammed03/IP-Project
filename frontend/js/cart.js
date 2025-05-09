@@ -147,7 +147,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       console.error('Add to cart failed:', err);
     }
   }
-
   async function removeFromCart(itemId) {
     try {
       const response = await fetch(`/api/cart/${itemId}`, {
@@ -165,16 +164,37 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  async function clearCart() {
+    try {
+      const response = await fetch('/api/cart', {
+        method: 'DELETE',
+        headers: headers
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to clear cart');
+      }
+
+      await fetchCart();
+    } catch (err) {
+      console.error('Clear cart failed:', err);
+    }
+  }
+
   // Event delegation
   document.addEventListener('click', function (e) {
     if (e.target.classList.contains('add-to-cart')) {
       addToCart(e.target.dataset.id);
-    }
-
-    if (e.target.classList.contains('remove-from-cart')) {
+    } if (e.target.classList.contains('remove-from-cart')) {
       removeFromCart(e.target.dataset.id);
     }
   });
+
+  // Add Clear Cart button event listener
+  const clearCartBtn = document.getElementById('clear-cart-btn');
+  if (clearCartBtn) {
+    clearCartBtn.addEventListener('click', clearCart);
+  }
 
   await fetchProducts();
   await fetchCart();
