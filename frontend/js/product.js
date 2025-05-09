@@ -176,12 +176,90 @@ function ProductBodyBuilder() {
 
     div = document.createElement('div');
     div.className = 'col-7';
-    row.appendChild(div);
-
-    button = document.createElement('button');
+    row.appendChild(div); button = document.createElement('button');
     button.className = 'btn btn-dark rounded-5 w-100';
     button.textContent = 'Add to Cart';
+    button.id = 'add-to-cart-btn';
+    button.onclick = addToCart;
     div.appendChild(button);
+}
+
+// Add to cart functionality
+async function addToCart() {
+    try {
+        // Get token from cookie for authentication
+        function getCookie(name) {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                const [cookieName, cookieValue] = cookie.trim().split('=');
+                if (cookieName === name) {
+                    return decodeURIComponent(cookieValue);
+                }
+            }
+            return null;
+        }
+
+        const token = getCookie('token');
+
+        if (!token) {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        // Get selected quantity
+        const quantity = parseInt(document.getElementById('quantity').textContent);
+
+        // Create loading effect on button
+        const button = document.getElementById('add-to-cart-btn');
+        const originalText = button.textContent;
+        button.textContent = 'Adding...';
+        button.disabled = true;
+
+        // Make API request to add item to cart using native fetch
+        const response = await fetch('/api/cart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                productId: productID,
+                quantity: quantity
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to add to cart');
+        }
+
+        // Restore button and show success message
+        button.textContent = 'Added to Cart!';
+        button.classList.add('btn-success');
+
+        // Reset button after delay
+        setTimeout(() => {
+            button.textContent = originalText;
+            button.classList.remove('btn-success');
+            button.classList.add('btn-dark');
+            button.disabled = false;
+        }, 2000);
+
+    } catch (error) {
+        console.error('Error adding to cart:', error);
+
+        // Show error on button
+        const button = document.getElementById('add-to-cart-btn');
+        button.textContent = 'Failed to Add';
+        button.classList.add('btn-danger');
+
+        // Reset button after delay
+        setTimeout(() => {
+            button.textContent = 'Add to Cart';
+            button.classList.remove('btn-danger');
+            button.classList.add('btn-dark');
+            button.disabled = false;
+        }, 2000);
+    }
 }
 
 ProductBodyBuilder();

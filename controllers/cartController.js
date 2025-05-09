@@ -37,22 +37,32 @@ const addToCart = async (req, res) => {
                 user: userId,
                 items: []
             });
-        }
-
-        // Check if product already in cart
+        }        // Check if product already in cart
         const itemIndex = cart.items.findIndex(item =>
             item.product.toString() === productId
         );
 
+        // Calculate discounted price if applicable
+        let finalPrice = product.price;
+        if (product.discount && product.discount > 0) {
+            // Apply discount percentage
+            const discountAmount = (product.price * product.discount) / 100;
+            finalPrice = product.price - discountAmount;
+            // Ensure price doesn't go below zero (though it shouldn't)
+            finalPrice = Math.max(finalPrice, 0);
+        }
+
         if (itemIndex > -1) {
-            // Product exists in cart, update quantity
+            // Product exists in cart, update quantity and price
             cart.items[itemIndex].quantity += quantity;
+            // Update price in case discount has changed
+            cart.items[itemIndex].price = finalPrice;
         } else {
             // Product does not exist in cart, add new item
             cart.items.push({
                 product: productId,
                 quantity,
-                price: product.price,
+                price: finalPrice,
                 name: product.name
             });
         }
@@ -141,10 +151,21 @@ const updateCartItem = async (req, res) => {
 
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
+        } if (product.countInStock < quantity) {
+            return res.status(400).json({ message: 'Insufficient stock' });
         }
 
-        if (product.countInStock < quantity) {
-            return res.status(400).json({ message: 'Insufficient stock' });
+        // Calculate discounted price if applicable
+        if (product.discount && product.discount > 0) {
+            // Apply discount percentage
+            const discountAmount = (product.price * product.discount) / 100;
+            const finalPrice = Math.max(product.price - discountAmount, 0);
+
+            // Update price with current discount
+            cart.items[itemIndex].price = finalPrice;
+        } else {
+            // Ensure price is updated to current product price (in case discount was removed)
+            cart.items[itemIndex].price = product.price;
         }
 
         // Update quantity

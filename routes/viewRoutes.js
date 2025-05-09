@@ -36,6 +36,6 @@ router.get('/orders', serveHtmlFile('orders.html'));
 router.get('/profile', auth, serveHtmlFile('profile.html'));
 
 // Dashboard page (likely admin only)
-router.get('/dashboard', serveHtmlFile('dashboard.html'));
+router.get('/dashboard', auth, checkRole(['admin']), serveHtmlFile('dashboard.html'));
 
 module.exports = router;
