@@ -3,6 +3,7 @@ import { fetchProducts, fetchOrders, addAllProducts, addAllOrders, makeRequest, 
 let productsList = await fetchProducts();
 let ordersList = await fetchOrders();
 let token = getCookie('token');
+let host = "http://localhost:3000";
 
 async function initializeTables() {
     if (productsList.length === 0) {
@@ -54,44 +55,49 @@ function initProductsTable() {
                          <td class="product-cell">
                             <button class="btn btn-primary" onclick="openEditModal('${product._id}')">Edit</button>
                             <button class="btn btn-danger" onclick="deleteProduct('${product._id}')">Delete</button>
+                            <button class="btn btn-secondary" onclick="openDiscountModal('${product._id}')">Set Discount</button>
                          </td>`;
         tbody.appendChild(row);
     });
 }
 
-document.getElementById("addProductForm").addEventListener("submit", function (event) {
-    event.preventDefault();
+async function addProduct () {
 
     const name = document.getElementById("productName").value;
+    const description = document.getElementById("productDescription").value;
     const price = parseFloat(document.getElementById("productPrice").value);
     const stock = parseInt(document.getElementById("productStock").value);
     const category = document.getElementById("productCategory").value;
     const imgPath = document.getElementById("productImage").value;
 
     const newProduct = {
-        _id: productsList.length + 1,
-        imgPath: imgPath,
         name: name,
-        rating: 0, // Default rating for new products
+        description: description,
         price: price,
-        discount: 0.0, // Default discount for new products
-        availableSizes: [], // Default empty sizes
         categories: [category],
-        arrivalDate: new Date().toISOString().split('T')[0], // Current date
-        stock: stock
+        brand: 'SHOP.CO',
+        countInStock: stock,
+        imagePath: imgPath,
+        isFeatured: true,
+        discount: 0.0, // Default discount for new products
     };
 
-    productsList.push(newProduct);
+    let data = await makeRequest(`${host}/api/products`, 'POST', newProduct, token);
+
+    if (!data._id){
+        alert("Failed to add product!");
+        return;
+    }
 
     alert("Product added successfully!");
     document.getElementById("addProductForm").reset();
-    const modal = bootstrap.Modal.getInstance(document.getElementById("addProductModal"));
+    const modal = new bootstrap.Modal(document.getElementById("addProductModal"));
     modal.hide();
 
     // Optionally, refresh the product table or UI
     console.log(productsList);
-    initProductsTable();
-});
+    window.open('./dashboard', '_self');
+};
 
 async function deleteProduct(productId) {
     const product = productsList.find(p => p._id === productId);
@@ -101,11 +107,6 @@ async function deleteProduct(productId) {
     }
 
     let res = await makeRequest(`${host}/api/products/${productId}`, 'DELETE', null, token);
-
-    if (res.status !== 200) {
-        alert("Failed to delete product!");
-        return;
-    }
 
     productsList = productsList.filter(p => p._id !== productId);
     alert("Product deleted successfully!");
@@ -313,6 +314,7 @@ function viewOrderDetails(orderId) {
     orderDetailsModal.show();
 }
 
+window.addProduct = addProduct;
 window.deleteProduct = deleteProduct;
 window.openEditModal = openEditModal;
 window.updateProduct = updateProduct;
