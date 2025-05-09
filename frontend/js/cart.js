@@ -62,9 +62,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   async function fetchCart() {
     try {
-      if (cartBody) {
-        cartBody.innerHTML = '<tr><td colspan="4" class="text-center">Loading cart...</td></tr>';
-      }
 
       const response = await fetch('/api/cart', {
         method: 'GET',
@@ -129,15 +126,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (subtotalSpan) subtotalSpan.textContent = data.total.toFixed(2);
 
     } catch (err) {
-      console.error('Error loading cart:', err); if (cartBody) {
-        cartBody.innerHTML = `
-            <tr>
-              <td colspan="4" class="text-center text-danger">
-                Error loading cart. Please try again.
-              </td>
-            </tr>
-          `;
-      }
+      console.error('Error loading cart:', err);
     }
   }
 
