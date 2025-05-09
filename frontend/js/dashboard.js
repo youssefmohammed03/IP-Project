@@ -1,7 +1,8 @@
-import { fetchProducts, fetchOrders, addAllProducts, addAllOrders } from "./utils.js";
+import { fetchProducts, fetchOrders, addAllProducts, addAllOrders, makeRequest, getCookie } from "./utils.js";
 
 let productsList = await fetchProducts();
 let ordersList = await fetchOrders();
+let token = getCookie('token');
 
 async function initializeTables() {
     if (productsList.length === 0) {
@@ -16,7 +17,6 @@ async function initializeTables() {
 }
 
 initializeTables();
-
 
 fetch('/api/auth/me', {
     method: 'GET'
@@ -93,7 +93,20 @@ document.getElementById("addProductForm").addEventListener("submit", function (e
     initProductsTable();
 });
 
-function deleteProduct(productId) {
+async function deleteProduct(productId) {
+    const product = productsList.find(p => p._id === productId);
+    if (!product) {
+        alert("Product not found!");
+        return;
+    }
+
+    let res = await makeRequest(`${host}/api/products/${productId}`, 'DELETE', null, token);
+
+    if (res.status !== 200) {
+        alert("Failed to delete product!");
+        return;
+    }
+
     productsList = productsList.filter(p => p._id !== productId);
     alert("Product deleted successfully!");
     console.log(productsList);
@@ -169,12 +182,12 @@ function initOrdersTable() {
         }
 
         row.innerHTML = `<td class="order-cell">${order._id}</td>
-                         <td class="order-cell">${order.user}</td>
+                         <td class="order-cell">${order.user._id}</td>
                          <td class="order-cell">${order.status}</td>
                          <td class="order-cell">$${order.totalPrice.toFixed(2)}</td>
                          <td class="order-cell">
                             <button class="btn btn-primary" onclick="viewOrderDetails('${order._id}')">View</button>
-                            <button class="btn btn-danger" onclick="deleteOrder('${order._id}')">Delete</button>
+                            <button class="btn btn-warning" onclick="updateOrderStatus('${order._id}')">Update Status</button>
                          </td>`;
         tbody.appendChild(row);
     });
@@ -182,12 +195,53 @@ function initOrdersTable() {
 
 initOrdersTable();
 
-function deleteOrder(orderId) {
-    ordersList = ordersList.filter(order => order._id !== orderId);
-    alert("Order deleted successfully!");
+function updateOrderStatus(orderId) {
+    const order = ordersList.find(order => order._id === orderId);
+    if (!order) {
+        alert("Order not found!");
+        return;
+    }
+
+    document.getElementById("orderStatusId").textContent = order._id;
+    const modal = new bootstrap.Modal(document.getElementById("updateOrderStatusModal"));
+    modal.show();
+
     console.log(ordersList);
     initOrdersTable();
 }
+
+document.getElementById("confirmUpdateOrderStatus").addEventListener("click", function () {
+    const selectedStatus = document.querySelector('input[name="orderStatus"]:checked');
+    if (!selectedStatus) {
+        alert("Please select a status to update.");
+        return;
+    }
+
+    const orderId = document.getElementById("orderStatusId").textContent;
+    const statusValue = selectedStatus.value;
+
+    let body = (statusValue == 'process-refund') ? {aproved: true, adminNotes: "Refund approved", restoreStock: true} : null;
+    let state = (statusValue == 'process-refund') ? "refunded" : "shipped";
+
+    // Make an API call to update the order status
+    makeRequest(`/api/orders/${orderId}/${statusValue}`, 'PUT', body, token)
+        .then(async (response) => {
+            console.log("Order status updated:", response);
+            if (response.status === state) {
+                ordersList = await fetchOrders();
+                alert("Order status updated successfully!");
+                const modal = bootstrap.Modal.getInstance(document.getElementById("updateOrderStatusModal"));
+                modal.hide();
+                initOrdersTable();
+            } else {
+                alert("Failed to update order status.");
+            }
+        })
+        .catch(error => {
+            console.error("Error updating order status:", error);
+            alert("An error occurred while updating the order status.");
+        });
+});
 
 function viewOrderDetails(orderId) {
     const order = ordersList.find(order => order._id === orderId);
@@ -197,7 +251,8 @@ function viewOrderDetails(orderId) {
     }
 
     document.getElementById("orderId").textContent = order._id;
-    document.getElementById("orderUser").textContent = order.user;
+    document.getElementById("orderUser").textContent = order.user._id;
+    document.getElementById("orderUserName").textContent = order.user.name;
     document.getElementById("orderStatus").textContent = order.status;
     document.getElementById("orderTotalPrice").textContent = order.totalPrice.toFixed(2);
 
@@ -225,5 +280,5 @@ function viewOrderDetails(orderId) {
 window.deleteProduct = deleteProduct;
 window.openEditModal = openEditModal;
 window.updateProduct = updateProduct;
-window.deleteOrder = deleteOrder;
+window.updateOrderStatus = updateOrderStatus;
 window.viewOrderDetails = viewOrderDetails;

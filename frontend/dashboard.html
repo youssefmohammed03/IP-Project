@@ -190,6 +190,7 @@
         <div class="modal-body">
           <p><strong>Order ID:</strong> <span id="orderId"></span></p>
           <p><strong>User ID:</strong> <span id="orderUser"></span></p>
+          <p><strong>User Name:</strong> <span id="orderUserName"></span></p>
           <p><strong>Status:</strong> <span id="orderStatus"></span></p>
           <p><strong>Total Price:</strong> $<span id="orderTotalPrice"></span></p>
           <p><strong>Items:</strong></p>
@@ -204,6 +205,35 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Update Order Status Modal -->
+  <div class="modal fade" id="updateOrderStatusModal" tabindex="-1" aria-labelledby="updateOrderStatusLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="updateOrderStatusLabel">Update Order Status</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p><strong>Order ID:</strong> <span id="orderStatusId"></span></p>
+          <form id="updateOrderStatusForm">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="orderStatus" id="statusShipped" value="ship">
+              <label class="form-check-label" for="statusShipped">Shipped</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="orderStatus" id="statusRefunded" value="process-refund">
+              <label class="form-check-label" for="statusRefunded">Refunded</label>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id="confirmUpdateOrderStatus">Confirm</button>
         </div>
       </div>
     </div>
