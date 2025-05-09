@@ -65,25 +65,39 @@ export function filterProducts(productsList, filters) {
 }
 
 export function specialSearchProducts(productsList, searchTerm) {
-
-    if (searchTerm.toLowerCase() == "new") {
-        return productsList.sort((a, b) => {
-            return new Date(b.arrivalDate) - new Date(a.arrivalDate);
-        }).slice(0, 10);
-    }
-
-    if (searchTerm.toLowerCase() == "sale") {
-        return productsList.filter((product) => {
-            return product.discount > 0;
-        }).sort((a, b) => {
-            return new Date(a.id) - new Date(b.id);
-        });
-    }
-
-    if (searchTerm.toLowerCase() == "all") {
+    if (!searchTerm || !productsList || productsList.length === 0) {
         return productsList;
     }
 
+    searchTerm = searchTerm.toLowerCase();
+
+    if (searchTerm === "new") {
+        console.log("Filtering for new arrivals");
+        // Sort by arrival date (newest first) and take the first 10
+        return [...productsList]
+            .sort((a, b) => {
+                const dateA = a.arrivalDate ? new Date(a.arrivalDate) : new Date(a.createdAt || 0);
+                const dateB = b.arrivalDate ? new Date(b.arrivalDate) : new Date(b.createdAt || 0);
+                return dateB - dateA;
+            })
+            .slice(0, 10);
+    }
+
+    if (searchTerm === "sale") {
+        console.log("Filtering for on sale items");
+        // Filter products with a discount greater than 0
+        return productsList.filter(product => {
+            return product.discount > 0;
+        });
+    }
+
+    if (searchTerm === "shop" || searchTerm === "all") {
+        console.log("Returning all products");
+        return productsList;
+    }
+
+    // If none of the above, return empty array
+    console.log("No matching special search for:", searchTerm);
     return [];
 }
 

@@ -1,6 +1,6 @@
 import { fetchProducts, specialSearchProducts, keyFilterProducts, searchProducts, filterProducts, addAllProducts } from "./utils.js";
 
-let maxPrice = 500;
+let maxPrice = 5000;
 let minPrice = 0;
 
 let filters = {
