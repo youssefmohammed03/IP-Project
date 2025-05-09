@@ -3,22 +3,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     const cartBody = document.getElementById('cart-body');
     const totalSpan = document.getElementById('total');
   
-    const token = localStorage.getItem('token'); // or however you manage auth
+    const token = getCookie('token'); // or however you manage auth
   
     const axiosAuth = axios.create({
       baseURL: '/api',
       headers: { Authorization: `Bearer ${token}` }
     });
+
+    function getCookie(name) {
+      const cookies = document.cookie.split(';');
+      for (let cookie of cookies) {
+          const [cookieName, cookieValue] = cookie.trim().split('=');
+          if (cookieName === name) {
+              return decodeURIComponent(cookieValue);
+          }
+      }
+      return null;
+    }
   
     async function fetchProducts() {
       try {
         const res = await axiosAuth.get('/products');
-        res.data.forEach(product => {
+        productList.innerHTML = '';
+        res.data.products.reverse().forEach(product => {
           const card = document.createElement('div');
           card.className = 'col-md-3';
           card.innerHTML = `
             <div class="card mb-4">
-              <img src="${product.imagePath}" class="card-img-top" alt="${product.name}">
+              <img src="${product.imagePath}" class="card-img-top" alt="${product.name}" onerror="this.src='./assets/Products/missing.png';this.setAttribute('onerror', '');">
               <div class="card-body">
                 <h5 class="card-title">${product.name}</h5>
                 <p class="card-text">$${product.price}</p>
@@ -35,6 +47,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function fetchCart() {
       try {
         const res = await axiosAuth.get('/cart');
+        console.log(res.data);
         cartBody.innerHTML = '';
         res.data.cart.items.forEach(item => {
           const row = document.createElement('tr');

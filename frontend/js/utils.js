@@ -1,49 +1,49 @@
 export const productsList = [
-    { _id: 1, imgPath: "./assets/Products/p1.png", name: "T-Shirt with Tape Details", rating: 4.5, price: "$125", discount: 0.0, availableSizes: ["small", "medium", "large"], categories: ["casual"], arrivalDate: "2025-01-01", stock: 100 },
-    { _id: 2, imgPath: "./assets/Products/p2.png", name: "Skinny Fit Jeans", rating: 5, price: "$240", discount: 0.0, availableSizes: ["medium", "large", "xlarge"], categories: ["casual"], arrivalDate: "2025-02-01", stock: 50 },
-    { _id: 3, imgPath: "./assets/Products/p3.png", name: "Checkered Shirt", rating: 3, price: "$180", discount: 0.20, availableSizes: ["small", "medium", "large", "xlarge"], categories: ["party"], arrivalDate: "2025-03-01", stock: 75 },
-    { _id: 4, imgPath: "./assets/Products/p4.png", name: "Sleeve Striped T-Shirt", rating: 2.5, price: "$130", discount: 0.0, availableSizes: ["xsmall", "small", "medium"], categories: ["casual"], arrivalDate: "2025-04-01", stock: 120 },
-    { _id: 5, imgPath: "./assets/Products/p5.png", name: "Gradient Graphic T-shirt", rating: 4.6, price: "$160", discount: 0.3, availableSizes: ["medium", "large", "xlarge", "xxlarge"], categories: ["casual", "party"], arrivalDate: "2024-04-01", stock: 80 },
-    { _id: 6, imgPath: "./assets/Products/p6.png", name: "Virtical Stripped Shirt", rating: 4.1, price: "$285", discount: 0.3, availableSizes: ["small", "medium", "large"], categories: ["casual", "party"], arrivalDate: "2024-02-01", stock: 60 },
-    { _id: 7, imgPath: "./assets/Products/p7.png", name: "Faded Skinny Jeans", rating: 3.5, price: "$240", discount: 0.1, availableSizes: ["xxsmall", "xsmall", "small"], categories: ["casual"], arrivalDate: "2022-07-01", stock: 30 },
-    { _id: 8, imgPath: "./assets/Products/p8.png", name: "Slim Fit Chinos", rating: 4.2, price: "$110", discount: 0.0, availableSizes: ["medium", "large", "xlarge", "xxlarge"], categories: ["casual"], arrivalDate: "2022-08-01", stock: 90 },
-    { _id: 9, imgPath: "./assets/Products/p9.png", name: "Crewneck Sweatshirt", rating: 4.6, price: "$85", discount: 0.0, availableSizes: ["small", "medium", "large", "xlarge", "xxxlarge"], categories: ["casual"], arrivalDate: "2022-09-01", stock: 110 },
-    { _id: 10, imgPath: "./assets/Products/p10.png", name: "Graphic Print Tee", rating: 4.1, price: "$60", discount: 0.0, availableSizes: ["xsmall", "small", "medium", "large"], categories: ["casual"], arrivalDate: "2022-10-01", stock: 70 },
-    { _id: 11, imgPath: "./assets/Products/p11.png", name: "Puffer Jacket", rating: 4.9, price: "$210", discount: 0.0, availableSizes: ["medium", "large", "xlarge", "xxlarge", "xxxlarge"], categories: ["casual"], arrivalDate: "2022-11-01", stock: 30 },
-    { _id: 12, imgPath: "./assets/Products/p12.png", name: "Linen Shorts", rating: 3.9, price: "$55", discount: 0.0, availableSizes: ["xsmall", "small", "medium"], categories: ["gym"], arrivalDate: "2022-12-01", stock: 0 },
+    { _id: 1, imgPath: "./assets/Products/p1.png", name: "T-Shirt with Tape Details", description: "A stylish t-shirt with tape details for a casual look.", rating: 4.5, price: "$125", discount: 0.0, availableSizes: ["small", "medium", "large"], categories: ["casual"], arrivalDate: "2025-01-01", stock: 100 },
+    { _id: 2, imgPath: "./assets/Products/p2.png", name: "Skinny Fit Jeans", description: "Comfortable skinny fit jeans for everyday wear.", rating: 5, price: "$240", discount: 0.0, availableSizes: ["medium", "large", "xlarge"], categories: ["casual"], arrivalDate: "2025-02-01", stock: 50 },
+    { _id: 3, imgPath: "./assets/Products/p3.png", name: "Checkered Shirt", description: "A classic checkered shirt perfect for parties.", rating: 3, price: "$180", discount: 0.20, availableSizes: ["small", "medium", "large", "xlarge"], categories: ["party"], arrivalDate: "2025-03-01", stock: 75 },
+    { _id: 4, imgPath: "./assets/Products/p4.png", name: "Sleeve Striped T-Shirt", description: "A casual t-shirt with striped sleeves for a trendy look.", rating: 2.5, price: "$130", discount: 0.0, availableSizes: ["xsmall", "small", "medium"], categories: ["casual"], arrivalDate: "2025-04-01", stock: 120 },
+    { _id: 5, imgPath: "./assets/Products/p5.png", name: "Gradient Graphic T-shirt", description: "A graphic t-shirt with a gradient design for casual and party wear.", rating: 4.6, price: "$160", discount: 0.3, availableSizes: ["medium", "large", "xlarge", "xxlarge"], categories: ["casual", "party"], arrivalDate: "2024-04-01", stock: 80 },
+    { _id: 6, imgPath: "./assets/Products/p6.png", name: "Virtical Stripped Shirt", description: "A vertical striped shirt suitable for casual and party occasions.", rating: 4.1, price: "$285", discount: 0.3, availableSizes: ["small", "medium", "large"], categories: ["casual", "party"], arrivalDate: "2024-02-01", stock: 60 },
+    { _id: 7, imgPath: "./assets/Products/p7.png", name: "Faded Skinny Jeans", description: "Skinny jeans with a faded design for a casual look.", rating: 3.5, price: "$240", discount: 0.1, availableSizes: ["xxsmall", "xsmall", "small"], categories: ["casual"], arrivalDate: "2022-07-01", stock: 30 },
+    { _id: 8, imgPath: "./assets/Products/p8.png", name: "Slim Fit Chinos", description: "Slim fit chinos for a comfortable and stylish appearance.", rating: 4.2, price: "$110", discount: 0.0, availableSizes: ["medium", "large", "xlarge", "xxlarge"], categories: ["casual"], arrivalDate: "2022-08-01", stock: 90 },
+    { _id: 9, imgPath: "./assets/Products/p9.png", name: "Crewneck Sweatshirt", description: "A cozy crewneck sweatshirt for casual wear.", rating: 4.6, price: "$85", discount: 0.0, availableSizes: ["small", "medium", "large", "xlarge", "xxxlarge"], categories: ["casual"], arrivalDate: "2022-09-01", stock: 110 },
+    { _id: 10, imgPath: "./assets/Products/p10.png", name: "Graphic Print Tee", description: "A graphic print tee for a casual and trendy look.", rating: 4.1, price: "$60", discount: 0.0, availableSizes: ["xsmall", "small", "medium", "large"], categories: ["casual"], arrivalDate: "2022-10-01", stock: 70 },
+    { _id: 11, imgPath: "./assets/Products/p11.png", name: "Puffer Jacket", description: "A warm puffer jacket for cold weather.", rating: 4.9, price: "$210", discount: 0.0, availableSizes: ["medium", "large", "xlarge", "xxlarge", "xxxlarge"], categories: ["casual"], arrivalDate: "2022-11-01", stock: 30 },
+    { _id: 12, imgPath: "./assets/Products/p12.png", name: "Linen Shorts", description: "Comfortable linen shorts for gym and casual wear.", rating: 3.9, price: "$55", discount: 0.0, availableSizes: ["xsmall", "small", "medium"], categories: ["gym"], arrivalDate: "2022-12-01", stock: 0 },
 
-    { _id: 13, imgPath: "./assets/Products/p13.png", name: "Varsity Jacket", rating: 5, price: "$275", discount: 0.0, availableSizes: ["medium", "large", "xlarge", "xxlarge"], categories: ["casual", "formal"], arrivalDate: "2023-01-01", stock: 45 },
-    { _id: 14, imgPath: "./assets/Products/p14.png", name: "Cargo Pants", rating: 4.4, price: "$95", discount: 0.0, availableSizes: ["small", "medium", "large", "xlarge"], categories: ["casual"], arrivalDate: "2023-02-01", stock: 85 },
-    { _id: 15, imgPath: "./assets/Products/p15.png", name: "V-Neck Sweater", rating: 3.8, price: "$80", discount: 0.0, availableSizes: ["xsmall", "small", "medium", "large"], categories: ["casual"], arrivalDate: "2023-03-01", stock: 17 },
-    { _id: 16, imgPath: "./assets/Products/p16.png", name: "Oversized Tee", rating: 4.3, price: "$65", discount: 0.0, availableSizes: ["medium", "large", "xlarge"], categories: ["casual"], arrivalDate: "2023-04-01", stock: 95 },
-    { _id: 17, imgPath: "./assets/Products/p17.png", name: "Fleece Joggers", rating: 4.7, price: "$100", discount: 0.0, availableSizes: ["small", "medium", "large", "xxlarge"], categories: ["casual"], arrivalDate: "2023-05-01", stock: 75 },
-    { _id: 18, imgPath: "./assets/Products/p18.png", name: "Ripped Jeans", rating: 4.5, price: "$130", discount: 0.0, availableSizes: ["medium", "large", "xlarge", "xxlarge"], categories: ["casual"], arrivalDate: "2023-06-01", stock: 60 },
-    { _id: 19, imgPath: "./assets/Products/p19.png", name: "Turtleneck Sweater", rating: 4.6, price: "$120", discount: 0.0, availableSizes: ["small", "medium", "large", "xlarge"], categories: ["casual"], arrivalDate: "2023-07-01", stock: 80 },
-    { _id: 20, imgPath: "./assets/Products/p20.png", name: "Polo Shirt", rating: 3.7, price: "$75", discount: 0.0, availableSizes: ["xsmall", "small", "medium", "large"], categories: ["casual"], arrivalDate: "2023-08-01", stock: 0 },
-    { _id: 21, imgPath: "./assets/Products/p21.png", name: "Knitted Cardigan", rating: 4.8, price: "$145", discount: 0.0, availableSizes: ["medium", "large", "xlarge", "xxlarge"], categories: ["casual"], arrivalDate: "2023-09-01", stock: 55 },
-    { _id: 22, imgPath: "./assets/Products/p22.png", name: "Tracksuit Set", rating: 4.2, price: "$170", discount: 0.0, availableSizes: ["small", "medium", "large", "xlarge", "xxxlarge"], categories: ["casual"], arrivalDate: "2023-10-01", stock: 40 },
-    { _id: 23, imgPath: "./assets/Products/p23.png", name: "Tank Top", rating: 3.6, price: "$30", discount: 0.0, availableSizes: ["xxsmall", "xsmall", "small"], categories: ["casual"], arrivalDate: "2023-11-01", stock: 100 },
-    { _id: 24, imgPath: "./assets/Products/p24.png", name: "Bomber Jacket", rating: 4.9, price: "$190", discount: 0.0, availableSizes: ["medium", "large", "xlarge", "xxlarge", "xxxlarge"], categories: ["casual"], arrivalDate: "2023-12-01", stock: 20 },
+    { _id: 13, imgPath: "./assets/Products/p13.png", name: "Varsity Jacket", description: "A stylish varsity jacket for casual and formal occasions.", rating: 5, price: "$275", discount: 0.0, availableSizes: ["medium", "large", "xlarge", "xxlarge"], categories: ["casual", "formal"], arrivalDate: "2023-01-01", stock: 45 },
+    { _id: 14, imgPath: "./assets/Products/p14.png", name: "Cargo Pants", description: "Durable cargo pants for a casual look.", rating: 4.4, price: "$95", discount: 0.0, availableSizes: ["small", "medium", "large", "xlarge"], categories: ["casual"], arrivalDate: "2023-02-01", stock: 85 },
+    { _id: 15, imgPath: "./assets/Products/p15.png", name: "V-Neck Sweater", description: "A comfortable v-neck sweater for casual wear.", rating: 3.8, price: "$80", discount: 0.0, availableSizes: ["xsmall", "small", "medium", "large"], categories: ["casual"], arrivalDate: "2023-03-01", stock: 17 },
+    { _id: 16, imgPath: "./assets/Products/p16.png", name: "Oversized Tee", description: "An oversized tee for a relaxed and casual look.", rating: 4.3, price: "$65", discount: 0.0, availableSizes: ["medium", "large", "xlarge"], categories: ["casual"], arrivalDate: "2023-04-01", stock: 95 },
+    { _id: 17, imgPath: "./assets/Products/p17.png", name: "Fleece Joggers", description: "Comfortable fleece joggers for casual wear.", rating: 4.7, price: "$100", discount: 0.0, availableSizes: ["small", "medium", "large", "xxlarge"], categories: ["casual"], arrivalDate: "2023-05-01", stock: 75 },
+    { _id: 18, imgPath: "./assets/Products/p18.png", name: "Ripped Jeans", description: "Stylish ripped jeans for a casual look.", rating: 4.5, price: "$130", discount: 0.0, availableSizes: ["medium", "large", "xlarge", "xxlarge"], categories: ["casual"], arrivalDate: "2023-06-01", stock: 60 },
+    { _id: 19, imgPath: "./assets/Products/p19.png", name: "Turtleneck Sweater", description: "A cozy turtleneck sweater for casual wear.", rating: 4.6, price: "$120", discount: 0.0, availableSizes: ["small", "medium", "large", "xlarge"], categories: ["casual"], arrivalDate: "2023-07-01", stock: 80 },
+    { _id: 20, imgPath: "./assets/Products/p20.png", name: "Polo Shirt", description: "A classic polo shirt for casual occasions.", rating: 3.7, price: "$75", discount: 0.0, availableSizes: ["xsmall", "small", "medium", "large"], categories: ["casual"], arrivalDate: "2023-08-01", stock: 0 },
+    { _id: 21, imgPath: "./assets/Products/p21.png", name: "Knitted Cardigan", description: "A warm knitted cardigan for casual wear.", rating: 4.8, price: "$145", discount: 0.0, availableSizes: ["medium", "large", "xlarge", "xxlarge"], categories: ["casual"], arrivalDate: "2023-09-01", stock: 55 },
+    { _id: 22, imgPath: "./assets/Products/p22.png", name: "Tracksuit Set", description: "A comfortable tracksuit set for casual wear.", rating: 4.2, price: "$170", discount: 0.0, availableSizes: ["small", "medium", "large", "xlarge", "xxxlarge"], categories: ["casual"], arrivalDate: "2023-10-01", stock: 40 },
+    { _id: 23, imgPath: "./assets/Products/p23.png", name: "Tank Top", description: "A lightweight tank top for casual wear.", rating: 3.6, price: "$30", discount: 0.0, availableSizes: ["xxsmall", "xsmall", "small"], categories: ["casual"], arrivalDate: "2023-11-01", stock: 100 },
+    { _id: 24, imgPath: "./assets/Products/p24.png", name: "Bomber Jacket", description: "A stylish bomber jacket for casual wear.", rating: 4.9, price: "$190", discount: 0.0, availableSizes: ["medium", "large", "xlarge", "xxlarge", "xxxlarge"], categories: ["casual"], arrivalDate: "2023-12-01", stock: 20 },
 
-    { _id: 25, imgPath: "./assets/Products/p25.png", name: "Athletic Shorts", rating: 4.1, price: "$50", discount: 0.0, availableSizes: ["xsmall", "small", "medium", "large"], categories: ["gym"], arrivalDate: "2024-01-01", stock: 19 },
-    { _id: 26, imgPath: "./assets/Products/p26.png", name: "Checked Blazer", rating: 4.7, price: "$200", discount: 0.0, availableSizes: ["medium", "large", "xlarge", "xxlarge"], categories: ["formal"], arrivalDate: "2023-01-01", stock: 30 },
-    { _id: 27, imgPath: "./assets/Products/p27.png", name: "Sleeveless Hoodie", rating: 3.5, price: "$70", discount: 0.0, availableSizes: ["small", "medium", "large"], categories: ["casual"], arrivalDate: "2023-02-01", stock: 50 },
-    { _id: 28, imgPath: "./assets/Products/p28.png", name: "Flannel Shirt", rating: 4.4, price: "$95", discount: 0.0, availableSizes: ["small", "medium", "large", "xlarge"], categories: ["party"], arrivalDate: "2023-03-01", stock: 65 },
-    { _id: 29, imgPath: "./assets/Products/p29.png", name: "Basic Tee Pack", rating: 4.3, price: "$85", discount: 0.0, availableSizes: ["xsmall", "small", "medium", "large"], categories: ["casual"], arrivalDate: "2023-04-01", stock: 90 },
-    { _id: 30, imgPath: "./assets/Products/p30.png", name: "Longline Shirt", rating: 4.0, price: "$75", discount: 0.0, availableSizes: ["medium", "large", "xlarge"], categories: ["casual"], arrivalDate: "2023-05-01", stock: 0 },
-    { _id: 31, imgPath: "./assets/Products/p31.png", name: "Distressed Jeans", rating: 4.2, price: "$140", discount: 0.0, availableSizes: ["medium", "large", "xlarge", "xxlarge"], categories: ["casual"], arrivalDate: "2023-06-01", stock: 70 },
-    { _id: 32, imgPath: "./assets/Products/p32.png", name: "Wool Overcoat", rating: 4.8, price: "$300", discount: 0.0, availableSizes: ["large", "xlarge", "xxlarge", "xxxlarge"], categories: ["formal"], arrivalDate: "2023-07-01", stock: 25 },
-    { _id: 33, imgPath: "./assets/Products/p33.png", name: "Colorblock Hoodie", rating: 4.6, price: "$95", discount: 0.0, availableSizes: ["small", "medium", "large", "xlarge"], categories: ["casual", "party"], arrivalDate: "2023-08-01", stock: 45 },
-    { _id: 34, imgPath: "./assets/Products/p34.png", name: "Utility Vest", rating: 3.9, price: "$100", discount: 0.0, availableSizes: ["xsmall", "small", "medium"], categories: ["casual"], arrivalDate: "2023-09-01", stock: 0 },
-    { _id: 35, imgPath: "./assets/Products/p35.png", name: "Sleeve Logo Tee", rating: 4.1, price: "$60", discount: 0.0, availableSizes: ["xsmall", "small", "medium", "large"], categories: ["casual", "gym"], arrivalDate: "2023-10-01", stock: 65 },
-    { _id: 36, imgPath: "./assets/Products/p36.png", name: "Cropped Cargo Pants", rating: 4.5, price: "$115", discount: 0.0, availableSizes: ["medium", "large", "xlarge", "xxlarge"], categories: ["casual"], arrivalDate: "2023-11-01", stock: 0 },
+    { _id: 25, imgPath: "./assets/Products/p25.png", name: "Athletic Shorts", description: "Comfortable athletic shorts for gym and casual wear.", rating: 4.1, price: "$50", discount: 0.0, availableSizes: ["xsmall", "small", "medium", "large"], categories: ["gym"], arrivalDate: "2024-01-01", stock: 19 },
+    { _id: 26, imgPath: "./assets/Products/p26.png", name: "Checked Blazer", description: "A stylish checked blazer for formal occasions.", rating: 4.7, price: "$200", discount: 0.0, availableSizes: ["medium", "large", "xlarge", "xxlarge"], categories: ["formal"], arrivalDate: "2023-01-01", stock: 30 },
+    { _id: 27, imgPath: "./assets/Products/p27.png", name: "Sleeveless Hoodie", description: "A sleeveless hoodie for a casual and sporty look.", rating: 3.5, price: "$70", discount: 0.0, availableSizes: ["small", "medium", "large"], categories: ["casual"], arrivalDate: "2023-02-01", stock: 50 },
+    { _id: 28, imgPath: "./assets/Products/p28.png", name: "Flannel Shirt", description: "A classic flannel shirt for party occasions.", rating: 4.4, price: "$95", discount: 0.0, availableSizes: ["small", "medium", "large", "xlarge"], categories: ["party"], arrivalDate: "2023-03-01", stock: 65 },
+    { _id: 29, imgPath: "./assets/Products/p29.png", name: "Basic Tee Pack", description: "A pack of basic tees for casual wear.", rating: 4.3, price: "$85", discount: 0.0, availableSizes: ["xsmall", "small", "medium", "large"], categories: ["casual"], arrivalDate: "2023-04-01", stock: 90 },
+    { _id: 30, imgPath: "./assets/Products/p30.png", name: "Longline Shirt", description: "A longline shirt for a casual and trendy look.", rating: 4.0, price: "$75", discount: 0.0, availableSizes: ["medium", "large", "xlarge"], categories: ["casual"], arrivalDate: "2023-05-01", stock: 0 },
+    { _id: 31, imgPath: "./assets/Products/p31.png", name: "Distressed Jeans", description: "Stylish distressed jeans for casual wear.", rating: 4.2, price: "$140", discount: 0.0, availableSizes: ["medium", "large", "xlarge", "xxlarge"], categories: ["casual"], arrivalDate: "2023-06-01", stock: 70 },
+    { _id: 32, imgPath: "./assets/Products/p32.png", name: "Wool Overcoat", description: "A warm wool overcoat for formal occasions.", rating: 4.8, price: "$300", discount: 0.0, availableSizes: ["large", "xlarge", "xxlarge", "xxxlarge"], categories: ["formal"], arrivalDate: "2023-07-01", stock: 25 },
+    { _id: 33, imgPath: "./assets/Products/p33.png", name: "Colorblock Hoodie", description: "A trendy colorblock hoodie for casual and party wear.", rating: 4.6, price: "$95", discount: 0.0, availableSizes: ["small", "medium", "large", "xlarge"], categories: ["casual", "party"], arrivalDate: "2023-08-01", stock: 45 },
+    { _id: 34, imgPath: "./assets/Products/p34.png", name: "Utility Vest", description: "A functional utility vest for casual wear.", rating: 3.9, price: "$100", discount: 0.0, availableSizes: ["xsmall", "small", "medium"], categories: ["casual"], arrivalDate: "2023-09-01", stock: 0 },
+    { _id: 35, imgPath: "./assets/Products/p35.png", name: "Sleeve Logo Tee", description: "A sleeve logo tee for gym and casual wear.", rating: 4.1, price: "$60", discount: 0.0, availableSizes: ["xsmall", "small", "medium", "large"], categories: ["casual", "gym"], arrivalDate: "2023-10-01", stock: 65 },
+    { _id: 36, imgPath: "./assets/Products/p36.png", name: "Cropped Cargo Pants", description: "Stylish cropped cargo pants for casual wear.", rating: 4.5, price: "$115", discount: 0.0, availableSizes: ["medium", "large", "xlarge", "xxlarge"], categories: ["casual"], arrivalDate: "2023-11-01", stock: 0 },
 
-    { _id: 37, imgPath: "./assets/Products/p37.png", name: "Button-Up Denim Shirt", rating: 4.3, price: "$95", discount: 0.2, availableSizes: ["small", "medium", "large", "xlarge"], categories: ["formal"], arrivalDate: "2023-12-01", stock: 85 },
-    { _id: 38, imgPath: "./assets/Products/p38.png", name: "Fitted Blazer", rating: 4.7, price: "$220", discount: 0.15, availableSizes: ["medium", "large", "xlarge", "xxlarge"], categories: ["formal"], arrivalDate: "2024-01-01", stock: 35 },
-    { _id: 39, imgPath: "./assets/Products/p39.png", name: "Cotton Hoodie", rating: 4, price: "$90", discount: 0.0, availableSizes: ["medium", "large", "xxlarge"], categories: ["casual"], arrivalDate: "2022-05-01", stock: 60 },
-    { _id: 40, imgPath: "./assets/Products/p40.png", name: "Striped Crop Top", rating: 3.9, price: "$45", discount: 0.25, availableSizes: ["xxsmall", "xsmall", "small"], categories: ["casual", "party"], arrivalDate: "2024-03-01", stock: 12 },
-    { _id: 41, imgPath: "./assets/Products/p41.png", name: "Denim Jacket", rating: 4.8, price: "$160", discount: 0.0, availableSizes: ["small", "medium", "large", "xxlarge"], categories: ["casual", "formal"], arrivalDate: "2022-06-01", stock: 45 },
-    { _id: 42, imgPath: "./assets/Products/p42.png", name: "Faux Leather Skirt", rating: 4.2, price: "$70", discount: 0.12, availableSizes: ["xsmall", "small", "medium"], categories: ["casual", "party"], arrivalDate: "2024-05-01", stock: 55 }
+    { _id: 37, imgPath: "./assets/Products/p37.png", name: "Button-Up Denim Shirt", description: "A button-up denim shirt for formal occasions.", rating: 4.3, price: "$95", discount: 0.2, availableSizes: ["small", "medium", "large", "xlarge"], categories: ["formal"], arrivalDate: "2023-12-01", stock: 85 },
+    { _id: 38, imgPath: "./assets/Products/p38.png", name: "Fitted Blazer", description: "A fitted blazer for a sharp and formal look.", rating: 4.7, price: "$220", discount: 0.15, availableSizes: ["medium", "large", "xlarge", "xxlarge"], categories: ["formal"], arrivalDate: "2024-01-01", stock: 35 },
+    { _id: 39, imgPath: "./assets/Products/p39.png", name: "Cotton Hoodie", description: "A comfortable cotton hoodie for casual wear.", rating: 4, price: "$90", discount: 0.0, availableSizes: ["medium", "large", "xxlarge"], categories: ["casual"], arrivalDate: "2022-05-01", stock: 60 },
+    { _id: 40, imgPath: "./assets/Products/p40.png", name: "Striped Crop Top", description: "A striped crop top for casual and party occasions.", rating: 3.9, price: "$45", discount: 0.25, availableSizes: ["xxsmall", "xsmall", "small"], categories: ["casual", "party"], arrivalDate: "2024-03-01", stock: 12 },
+    { _id: 41, imgPath: "./assets/Products/p41.png", name: "Denim Jacket", description: "A classic denim jacket for casual and formal wear.", rating: 4.8, price: "$160", discount: 0.0, availableSizes: ["small", "medium", "large", "xxlarge"], categories: ["casual", "formal"], arrivalDate: "2022-06-01", stock: 45 },
+    { _id: 42, imgPath: "./assets/Products/p42.png", name: "Faux Leather Skirt", description: "A faux leather skirt for casual and party occasions.", rating: 4.2, price: "$70", discount: 0.12, availableSizes: ["xsmall", "small", "medium"], categories: ["casual", "party"], arrivalDate: "2024-05-01", stock: 55 }
 ];
 
 export const ordersList = [
@@ -277,23 +277,41 @@ export const ordersList = [
     }
 ];
 
+let host = "http://localhost:3000";
+export const envToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MWQxYmJkYzk2Y2ExYjZkNzVhOWM4OCIsImVtYWlsIjoiYWRtaW5Ac3lzdGVtLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0NjczODE2MiwiZXhwIjoxNzQ2ODI0NTYyfQ.Q3PDQYrWwrL2fH5t6ckj70cNnkYsPhlJcZ79oSA18fA";
+
+
 export async function fetchProducts() {
-    return productsList;
+    try {
+        let query = {
+            limit: 0
+        }
+        const res = await makeRequest(`${host}/api/products`, 'GET', null, envToken, query);
+        console.log(res);
+        return res.products.reverse();
+    } catch (err) {
+        console.error('Error fetching products', err);
+    }
+}
+
+export async function fetchOrders() {
+    return ordersList;
 }
 
 export async function fetchProductById(id) {
-    console.log(id);
-    const product = productsList.find((product) => product._id == id);
-    if (!product) {
-        throw new Error("Product not found");
+    try {
+        const res = await makeRequest(`${host}/api/products/${id}`, 'GET', null, null);
+        console.log(res);
+        return res;
+    }catch (err) {
+        console.error('Error fetching product', err);
     }
-    return product;
 }
 
 export function filterProducts(productsList, filters){
     let filteredProducts = productsList.filter((product) => {
         
-        const price = parseInt(product.price.slice(1));
+        const price = parseInt(product.price);
         if(filters.minPrice > price || filters.maxPrice < price) {
             return false;
         }
@@ -353,4 +371,113 @@ export function searchProducts(productsList, searchTerm) {
     return productsList.filter((product) => {
         return product.name.toLowerCase().includes(searchTerm.toLowerCase());
     });
+}
+
+export async function makeRequest(endpoint, method = 'GET', body = null, token = null, params = null) {
+  try {
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    // Append query params for GET requests
+    if (params && method === 'GET') {
+      const query = new URLSearchParams(params).toString();
+      endpoint += `?${query}`;
+    }
+
+    const options = {
+      method,
+      headers,
+    };
+
+    if (body && method !== 'GET') {
+      options.body = JSON.stringify(body);
+    }
+
+    const response = await fetch(endpoint, options);
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status} - ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+
+  } catch (error) {
+    console.error("Request failed:", error);
+    throw error;
+  }
+}
+
+export async function addAllProducts(){
+    productsList.forEach(async (product) => {
+        await createProduct(product, envToken);
+    })
+    let products = await fetchProducts();
+    for (let i = 0; i < products.length; i++) {
+        let product = products[i];
+        let rating = Math.floor(Math.random() * 5) + 1;
+        await addProductReview(product, {rating: rating, comment: "This is a great product"}, envToken);
+    }
+}
+
+export async function getAllOrders(token) {
+    return await makeRequest(`${host}/api/orders`, 'GET', null, token);
+}
+
+export function addProductReview(product, review, token){
+    if (!token) {
+        throw new Error("Authentication token is required");
+    }
+
+    let body = {
+        rating: review.rating > 1 ? review.rating : 1,
+        comment: review.comment
+    }
+
+    const endpoint = `${host}/api/products/${product.id}/reviews`;
+    return makeRequest(endpoint, 'POST', body, token);
+}
+
+export async function createProduct(product, token) {
+    if (!token) {
+        throw new Error("Authentication token is required");
+    }
+
+    let body = {
+        name: product.name,
+        description: product.description,
+        price: parseInt(product.price.slice(1)),
+        categories: product.categories,
+        availableSizes: product.availableSizes,
+        brand: 'SHOP.CO',
+        countInStock: product.stock,
+        imagePath: product.imgPath,
+        isFeatured: true,
+        discount: product.discount * 100
+    }
+
+    const endpoint = `${host}/api/products`;
+    return await makeRequest(endpoint, 'POST', body, token);
+}
+
+export async function addToCart(cartItem, token) {
+    const endpoint = `${host}/api/cart`;
+    return await makeRequest(endpoint, 'POST', cartItem, token);
+    
+}
+
+export function getCookie(name) {
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+        const [cookieName, cookieValue] = cookie.trim().split('=');
+        if (cookieName === name) {
+            return decodeURIComponent(cookieValue);
+        }
+    }
+    return null;
 }

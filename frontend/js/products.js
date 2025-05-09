@@ -1,4 +1,4 @@
-import { fetchProducts, specialSearchProducts, keyFilterProducts, searchProducts, filterProducts } from "./utils.js";
+import { fetchProducts, specialSearchProducts, keyFilterProducts, searchProducts, filterProducts, addAllProducts } from "./utils.js";
 
 let maxPrice = 500;
 let minPrice = 0;
@@ -128,7 +128,7 @@ function productBuilder(elementID, searchFilter) {
             row.appendChild(col);
 
             const img = document.createElement("img");
-            img.src = product.imgPath;
+            img.src = product.imagePath;
             img.setAttribute("onerror", "this.src='./assets/Products/missing.png';this.setAttribute('onerror', '');");
             img.className = "img-fluid rounded my-2";
             img.style.aspectRatio = "1/1";
@@ -151,10 +151,10 @@ function productBuilder(elementID, searchFilter) {
 
             const productPrice = document.createElement("h5");
             if (product.discount > 0) {
-                productPrice.innerHTML = `<span>$${parseInt(product.price.slice(1, product.price.length) * (1 - product.discount))}</span> <span class="text-decoration-line-through text-muted">${product.price}</span>`;
+                productPrice.innerHTML = `<span>$${parseInt(product.price * (1 - product.discount/100))}</span> <span class="text-decoration-line-through text-muted">$${product.price}</span>`;
             }
             else {
-                productPrice.innerHTML = product.price;
+                productPrice.innerHTML = `$${product.price}`;
             }
             col.appendChild(productPrice);
         });
@@ -240,6 +240,7 @@ window.closeFilters = closeFilters;
 window.updateFilters = updateFilters;
 window.productBuilder = productBuilder;
 window.applyFilters = applyFilters;
+window.addAllProducts = addAllProducts;
 
 productBuilder("products-body", filters);
 

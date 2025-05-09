@@ -1,13 +1,13 @@
-import { fetchProducts } from "./utils.js";
-import { ordersList } from "./utils.js";
+import { fetchProducts, fetchOrders } from "./utils.js";
 
 let productsList = await fetchProducts();
+let ordersList = await fetchOrders();
 
 function initProductsTable(){
     let tbody = document.getElementById("productTableBody");
     tbody.innerHTML = ""; // Clear existing rows
     productsList.forEach((product) => {
-        const discountedPrice = product.price.slice(1) * (1 - product.discount);
+        const discountedPrice = product.price * (1 - product.discount/100);
         let row = document.createElement("tr");
         if(product.stock <= 0) {
             row.style.backgroundColor = "#ffcccc"; // Highlight row with light red color
@@ -16,8 +16,8 @@ function initProductsTable(){
         }
         row.innerHTML = `<td class="product-cell">${product._id}</td>
                          <td class="product-cell">${product.name}</td>
-                         <td class="product-cell">${product.price}</td>
-                         <td class="product-cell">${product.discount > 0 ? `$${discountedPrice.toFixed(2)} (${product.discount*100}%)` : "No Discount"}</td>
+                         <td class="product-cell">$${product.price}</td>
+                         <td class="product-cell">${product.discount > 0 ? `$${discountedPrice.toFixed(2)} (${product.discount}%)` : "No Discount"}</td>
                          <td class="product-cell">${product.stock}</td>
                          <td class="product-cell">
                             <button class="btn btn-primary" onclick="openEditModal(${product._id})">Edit</button>
@@ -43,7 +43,7 @@ document.getElementById("addProductForm").addEventListener("submit", function(ev
         imgPath: imgPath,
         name: name,
         rating: 0, // Default rating for new products
-        price: `$${price}`,
+        price: price,
         discount: 0.0, // Default discount for new products
         availableSizes: [], // Default empty sizes
         categories: [category],
@@ -81,9 +81,9 @@ function openEditModal(productId) {
 
     document.getElementById("editProductId").value = product._id;
     document.getElementById("editProductName").value = product.name;
-    document.getElementById("editProductPrice").value = parseFloat(product.price.slice(1));
+    document.getElementById("editProductPrice").value = parseFloat(product.price);
     document.getElementById("editProductStock").value = product.stock;
-    document.getElementById("editProductCategory").value = product.categories[0];
+    document.getElementById("editProductCategory").value = product.categories;
     document.getElementById("editProductImage").value = product.imgPath;
 
     const editModal = new bootstrap.Modal(document.getElementById("editProductModal"));
@@ -107,7 +107,7 @@ function updateProduct() {
     productsList[productIndex] = {
         ...productsList[productIndex],
         name: name,
-        price: `$${price}`,
+        price: price,
         stock: stock,
         categories: [category],
         imgPath: imgPath

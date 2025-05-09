@@ -1,12 +1,10 @@
-import { fetchProductById } from './utils.js';
+import { fetchProductById, addToCart, getCookie, addAllProducts } from './utils.js';
 
 const params = new URLSearchParams(window.location.search);
 const productID = params.get('id'); 
 const product = await fetchProductById(productID);
 
-console.log(product);
-
-function ProductBodyBuilder(){
+function ProductBodyBuilder(product){
     let container = document.getElementById('product-body');
     container.innerHTML = '';
 
@@ -19,7 +17,7 @@ function ProductBodyBuilder(){
     row.appendChild(col);
 
     let img = document.createElement('img');
-    img.src = product.imgPath;
+    img.src = product.imagePath;
     img.className = 'img-fluid rounded-5 h-md-75 my-4';
     img.id = 'product-image';
     col.appendChild(img);
@@ -64,16 +62,16 @@ function ProductBodyBuilder(){
 
     if (product.discount <= 0) {
         let span = document.createElement('span');
-        span.textContent = `${product.price}`;
+        span.textContent = `$${product.price}`;
         h2.appendChild(span);
     }else {
         let span = document.createElement('span');
-        span.textContent = `$${(parseInt(product.price.slice(1)) * (1 - product.discount)).toFixed(0)} `;
+        span.textContent = `$${(parseInt(product.price) * (1 - product.discount/100)).toFixed(0)} `;
         h2.appendChild(span);
         
         span = document.createElement('span');
         span.className = 'text-decoration-line-through text-secondary';
-        span.textContent = ` ${product.price}`;
+        span.textContent = ` $${product.price}`;
         h2.appendChild(span);
     }
 
@@ -176,69 +174,25 @@ function ProductBodyBuilder(){
     button = document.createElement('button');
     button.className = 'btn btn-dark rounded-5 w-100';
     button.textContent = 'Add to Cart';
+    button.onclick = addProductToCart;
     div.appendChild(button);
 }
 
-ProductBodyBuilder();
+async function addProductToCart() {
+    try {
+        let itemBody = {
+            productId: product._id,
+            quantity: parseInt(document.getElementById('quantity').textContent)
+        }
+        
+        await addToCart(itemBody, getCookie('token'));
+        
+        alert('Product added to cart successfully!');
+    } catch (err) {
+        console.error('Error adding product to cart', err);
+    }
+}
 
-
-
-
-
-
-
-
-
-
-
-/*
-<div class="row justify-content-center">
-<div class="col-10 col-md-auto d-flex justify-content-center">
-    <img src="assets/Products/p1.png" class="img-fluid rounded-5" id="product-image" alt="Product Image">
-</div>
-<div class="col-10 col-md-4">
-    <div class="col-11">
-        <h1 class="title fs-1" id="product-title">T-Shirt</h1>
-    </div>
-    <div class="col-11">
-        <i class="bi bi-star-fill text-warning"></i>
-        <i class="bi bi-star-fill text-warning"></i>
-        <i class="bi bi-star-fill text-warning"></i>
-        3/5
-    </div>
-    <div class="col-11">
-        <h2 class="title fs-4">
-            <span>$260</span>
-            <span class="text-decoration-line-through text-secondary">$300</span>
-        </h2>
-    </div>
-    <div class="col-11">
-        <p class="small text-secondary">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-            incididunt ut labore et dolore magna aliqua.</p>
-    </div>
-    <hr>
-    <div class="col-11">
-        <h2 class="small text-secondary">Select Size</h2>
-        <div class="d-flex gap-2">
-            <button class="btn btn-outline-dark rounded-5" id="size-s"><small>Small</small></button>
-            <button class="btn btn-outline-dark rounded-5" id="size-m"><small>Medium</small></button>
-            <button class="btn btn-outline-dark rounded-5" id="size-l"><small>Large</small></button>
-            <button class="btn btn-outline-dark rounded-5" id="size-xl"><small>X-Large</small></button>
-        </div>
-    </div>
-    <hr>
-    <div class="row">
-        <div class="col-5">
-            <div class="border rounded-5" style="width: fit-content;">
-                <button class="btn btn-outline-secondary rounded-5"><i class="bi bi-plus"></i></button>
-                <span class="mx-2">1</span>
-                <button class="btn btn-outline-secondary rounded-5"><i class="bi bi-dash"></i></button>
-            </div>
-        </div>
-        <div class="col-7">
-            <button class="btn btn-dark rounded-5 w-100">ADD TO CART</button>
-        </div>
-    </div>
-</div>
-</div>
-*/
+ProductBodyBuilder(product);
+window.addProductToCart = addProductToCart;
+window.addAllProducts = addAllProducts;

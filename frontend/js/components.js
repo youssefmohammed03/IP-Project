@@ -3,7 +3,7 @@ class NavBar extends HTMLElement {
         this.innerHTML = `
             <nav class="navbar navbar-expand-lg my-3">
                 <div class="container-fluid mx-5">
-                    <a class="navbar-brand" href="#"><img src="./assets/LOGO.svg" alt=""></a>
+                    <a class="navbar-brand" href="./index.html"><img src="./assets/LOGO.svg" alt=""></a>
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                         data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
                         aria-label="Toggle navigation">
@@ -49,7 +49,7 @@ class FooterSection extends HTMLElement {
                     <div class="col-8 col-md-4">
                         <form>
                             <div class="mb-3">
-                                <input type="email" class="form-control rounded-5" id="InputEmail1"
+                                <input type="email" class="form-control rounded-5" id="InputEmail3"
                                     placeholder="Enter your email">
                             </div>
                             <button type="submit" class="btn btn-light rounded-5 w-100">Subscribe to Newsletter</button>

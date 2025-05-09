@@ -39,11 +39,11 @@ function productConainerBuilder(elementID, searchFilter, number) {
     products.forEach((product) => {
         let col = document.createElement("div");
         col.className = "col-auto justify-content-center hover-card";
-        col.setAttribute("onclick", `window.open('product.html?id=${product.id}', '_blank');`);
+        col.setAttribute("onclick", `window.open('product.html?id=${product._id}', '_blank');`);
         row.appendChild(col);
         
         let img = document.createElement("img");
-        img.src = product.imgPath;
+        img.src = product.imagePath;
         img.setAttribute("onerror", "this.src='./assets/Products/missing.png';this.setAttribute('onerror', '');");
         img.className = "img-fluid rounded my-2";
         img.style.width = "240px";
@@ -67,10 +67,10 @@ function productConainerBuilder(elementID, searchFilter, number) {
         
         let productPrice = document.createElement("h5");
         if (product.discount > 0) {
-            productPrice.innerHTML = `<span>$${parseInt(product.price.slice(1, product.price.length) * (1 - product.discount))}</span> <span class="text-decoration-line-through text-muted">${product.price}</span>`;
+            productPrice.innerHTML = `<span>$${parseInt(product.price * (1 - product.discount/100))}</span> <span class="text-decoration-line-through text-muted">$${product.price}</span>`;
         }
         else {
-            productPrice.innerHTML = product.price;
+            productPrice.innerHTML = `$${product.price}`;
         }
         
         col.appendChild(productPrice);
