@@ -12,8 +12,8 @@
 <body>
     <nav-bar></nav-bar>
 
-    <div id="orders-body" class="container-fluid">
-        <div class="container mt-5 p-4 shadow rounded-5" style="background-color: #F2F0F1;">
+    <div id="orders-body" class="container-fluid py-4 shadow rounded-5" style="background-color: #F2F0F1;">
+        <div class="container mt-5 overflow-x-scroll">
             <table class="table table-bordered">
                 <thead>
                     <tr>
@@ -35,6 +35,34 @@
                 </tbody>
             </table>
         </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="refundModal" tabindex="-1" aria-labelledby="refundModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="refundModalLabel">Request Refund</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="refundForm">
+              <div class="mb-3">
+                <label for="refundReason" class="form-label">Reason</label>
+                <input type="text" class="form-control" id="refundReason" required>
+              </div>
+              <div class="mb-3">
+                <label for="refundNotes" class="form-label">Notes</label>
+                <textarea class="form-control" id="refundNotes" rows="3"></textarea>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="submitRefund">Submit</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <footer-section></footer-section>

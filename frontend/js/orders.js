@@ -100,8 +100,39 @@ async function cancelOrder(orderId) {
 }
 
 function requestRefund(orderId) {
-    alert(`Request refund for order with ID: ${orderId}`);
-    // Add logic to request a refund
+    const refundModal = new bootstrap.Modal(document.getElementById('refundModal'));
+    refundModal.show();
+
+    const submitButton = document.getElementById('submitRefund');
+    submitButton.onclick = async function () {
+        const reason = document.getElementById('refundReason').value;
+        const notes = document.getElementById('refundNotes').value;
+
+        if (!reason | !notes) {
+            alert('Reason and Notes are required');
+            return;
+        }
+
+        try {
+            const res = await makeRequest(
+                `${host}/api/orders/${orderId}/request-refund`,
+                'PUT',
+                { reason, notes },
+                userToken
+            );
+
+            if (res.status === 'refund_requested') {
+                alert('Refund requested successfully');
+                refundModal.hide();
+                await getOrders();
+            } else {
+                alert('Failed to request refund');
+            }
+        } catch (error) {
+            console.error(error);
+            alert('An error occurred while requesting a refund');
+        }
+    };
 }
 
 window.cancelOrder = cancelOrder;
