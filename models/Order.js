@@ -102,8 +102,8 @@ const orderSchema = new mongoose.Schema({
     status: {
         type: String,
         required: true,
-        enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'refund_requested', 'refunded'],
-        default: 'pending'
+        enum: ['paid', 'shipped', 'cancelled', 'refund_requested', 'refunded'],
+        default: 'paid'
     },
     // Refund related fields
     refundReason: {

@@ -6,7 +6,7 @@ let minPrice = 0;
 let filters = {
     minPrice: minPrice,
     maxPrice: maxPrice,
-    
+
     sizes: {
         "xxsmall": false,
         "xsmall": false,
@@ -24,40 +24,40 @@ let filters = {
         "party": false,
         "gym": false
     },
-    
+
     rating: 0
 };
 
 let productsList = await fetchProducts();
 
 const params = new URLSearchParams(window.location.search);
-const productSearch = params.get('search'); 
+const productSearch = params.get('search');
 const productKey = params.get("key");
 const productQuery = params.get("query");
 
-if (productSearch){
+if (productSearch) {
     let filteredProductsList = specialSearchProducts(productsList, productSearch);
-    if (filteredProductsList){
+    if (filteredProductsList) {
         productsList = filteredProductsList;
         document.getElementById('products-title').innerHTML += (" - " + productSearch);
     }
-} else if (productKey){
+} else if (productKey) {
     let filteredProductsList = keyFilterProducts(productsList, productKey);
-    if (filteredProductsList){
+    if (filteredProductsList) {
         productsList = filteredProductsList;
         document.getElementById(`${productKey.split("-")[1]}-style`).checked = true;
         updateFilters(document.getElementById(`${productKey.split("-")[1]}-style`));
     }
-} else if (productQuery){
+} else if (productQuery) {
     let filteredProductsList = searchProducts(productsList, productQuery);
     productsList = filteredProductsList;
 }
 
-function updateFilters(element){
+function updateFilters(element) {
     let filter = element.id.split("-");
-    switch (filter[1]){
+    switch (filter[1]) {
         case "Price":
-            switch (filter[0]){
+            switch (filter[0]) {
                 case "Min":
                     filters.minPrice = element.value;
                     break;
@@ -80,22 +80,22 @@ function updateFilters(element){
     productBuilder("products-body", filters);
 }
 
-function setLabelValue(element){
+function setLabelValue(element) {
     let id = element.id;
     let label = document.querySelector(`label[for="${id}"]`);
     if (label) {
         label.innerHTML = id.replace("-", " ") + ": " + element.value;
-    }else{
+    } else {
         console.error("Label not found for element with id: " + id);
     }
 }
 
-function closeFilters(){
+function closeFilters() {
     let filters = document.getElementById("filters");
     filters.classList.remove("show");
 }
 
-function applyFilters(){
+function applyFilters() {
     productBuilder("products-body", filters);
 }
 
@@ -142,16 +142,15 @@ function productBuilder(elementID, searchFilter) {
             productRating.className = "fs-6";
             for (let i = 0; i < Math.floor(product.rating); i++) {
                 productRating.innerHTML += '<i class="text-warning bi bi-star-fill"></i>';
-            }
-            if (product.rating % 1 !== 0) {
+            } if (product.rating % 1 !== 0) {
                 productRating.innerHTML += '<i class="text-warning bi bi-star-half"></i>';
             }
-            productRating.innerHTML += `<span class="text-muted"> ${product.rating}/5</span>`;
+            productRating.innerHTML += `<span class="text-muted"> ${product.rating.toFixed(1)}/5</span>`;
             col.appendChild(productRating);
 
             const productPrice = document.createElement("h5");
             if (product.discount > 0) {
-                productPrice.innerHTML = `<span>$${parseInt(product.price * (1 - product.discount/100))}</span> <span class="text-decoration-line-through text-muted">$${product.price}</span>`;
+                productPrice.innerHTML = `<span>$${parseInt(product.price * (1 - product.discount / 100))}</span> <span class="text-decoration-line-through text-muted">$${product.price}</span>`;
             }
             else {
                 productPrice.innerHTML = `$${product.price}`;

@@ -29,8 +29,8 @@ class NavBar extends HTMLElement {
                             </form>
                         </ul>
                     </div>
-                    <a href="./cart.html" class="mx-3 text-dark"><i class="bi bi-cart4"></i></a>
-                    <a href="./profile.html" class="mx-3 text-dark"><i class="bi bi-person-circle"></i></a>
+                    <a href="./cart" class="mx-3 text-dark"><i class="bi bi-cart4"></i></a>
+                    <a href="./profile" class="mx-3 text-dark"><i class="bi bi-person-circle"></i></a>
                 </div>
             </nav>
         `;

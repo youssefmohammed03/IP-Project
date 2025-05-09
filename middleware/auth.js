@@ -7,6 +7,8 @@ const auth = (req, res, next) => {
         let token;
         const authHeader = req.header('Authorization');
 
+        console.log('Auth header:', authHeader);
+
         if (authHeader) {
             // Format: "Bearer [token]" or just the token
             if (authHeader.startsWith('Bearer ')) {
@@ -21,10 +23,11 @@ const auth = (req, res, next) => {
             token = req.query.token || (req.cookies && req.cookies.token);
         }
 
-        if (!token) {
-            res.redirect('/login');
-            return;
+        console.log('Token extracted:', token ? token.substring(0, 20) + '...' : 'No token');
 
+        if (!token) {
+            console.log('No token provided');
+            return res.status(401).json({ message: 'No authentication token, access denied' });
         }
 
         // Verify token
@@ -41,11 +44,17 @@ const auth = (req, res, next) => {
         req.user = decoded;
         next();
     } catch (error) {
-        console.error('Auth error:', error.message);
+        console.error('Auth error:', error);
+
         if (error.name === 'TokenExpiredError') {
-            res.redirect('/login');
+            return res.status(401).json({ message: 'Token expired' });
         }
-        res.redirect('/login');
+
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: 'Invalid token' });
+        }
+
+        return res.status(500).json({ message: 'Server authentication error' });
     }
 };
 

@@ -4,15 +4,15 @@ let productsList = await fetchProducts();
 let ordersList = await fetchOrders();
 
 async function initializeTables() {
-  if (productsList.length === 0) {
-    await addAllProducts();          
-    initProductsTable();           
-  }
+    if (productsList.length === 0) {
+        await addAllProducts();
+        initProductsTable();
+    }
 
-  if (ordersList.length === 0) {
-    await addAllOrders();             
-    initOrdersTable();
-  }
+    if (ordersList.length === 0) {
+        await addAllOrders();
+        initOrdersTable();
+    }
 }
 
 initializeTables();
@@ -29,21 +29,21 @@ fetch('/api/auth/me', {
     if (data.role !== 'admin') {
         alert('You are not authorized to access this page.');
         window.location.href = '/';
-    }else{
+    } else {
         initProductsTable();
         initOrdersTable();
     }
 })
 
-function initProductsTable(){
+function initProductsTable() {
     let tbody = document.getElementById("productTableBody");
     tbody.innerHTML = ""; // Clear existing rows
     productsList.forEach((product) => {
-        const discountedPrice = product.price * (1 - product.discount/100);
+        const discountedPrice = product.price * (1 - product.discount / 100);
         let row = document.createElement("tr");
-        if(product.countInStock <= 0) {
+        if (product.countInStock <= 0) {
             row.style.backgroundColor = "#ffcccc"; // Highlight row with light red color
-        }else if(product.countInStock < 20) {
+        } else if (product.countInStock < 20) {
             row.style.backgroundColor = "#fffccc"; // Highlight row with light red color
         }
         row.innerHTML = `<td class="product-cell">${product._id}</td>
@@ -59,7 +59,7 @@ function initProductsTable(){
     });
 }
 
-document.getElementById("addProductForm").addEventListener("submit", function(event) {
+document.getElementById("addProductForm").addEventListener("submit", function (event) {
     event.preventDefault();
 
     const name = document.getElementById("productName").value;
@@ -200,7 +200,7 @@ function viewOrderDetails(orderId) {
     document.getElementById("orderUser").textContent = order.user;
     document.getElementById("orderStatus").textContent = order.status;
     document.getElementById("orderTotalPrice").textContent = order.totalPrice.toFixed(2);
-    
+
     const itemsList = document.getElementById("orderItemsList");
     itemsList.innerHTML = "";
     order.orderItems.forEach(item => {
@@ -208,16 +208,16 @@ function viewOrderDetails(orderId) {
         listItem.textContent = `${item.name} (x${item.quantity}) - $${item.price.toFixed(2)}`;
         itemsList.appendChild(listItem);
     });
-    
+
     const shippingAddress = order.shippingAddress;
     document.getElementById("orderShippingAddress").textContent = `${shippingAddress.address}, ${shippingAddress.city}, ${shippingAddress.postalCode}, ${shippingAddress.country}`;
-    
+
     document.getElementById("orderPaymentMethod").textContent = order.paymentMethod;
     document.getElementById("orderIsPaid").textContent = order.isPaid ? "Yes" : "No";
     document.getElementById("orderIsDelivered").textContent = order.isDelivered ? "Yes" : "No";
     document.getElementById("orderCreatedAt").textContent = order.createdAt.split('T')[0] + " " + order.createdAt.split('T')[1].split('.')[0];
     document.getElementById("orderUpdatedAt").textContent = order.updatedAt.split('T')[0] + " " + order.updatedAt.split('T')[1].split('.')[0];
-    
+
     const orderDetailsModal = new bootstrap.Modal(document.getElementById("orderDetailsModal"));
     orderDetailsModal.show();
 }
