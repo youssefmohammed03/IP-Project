@@ -254,8 +254,12 @@
         <div class="modal-body">
           <form id="discountForm">
             <div class="mb-3">
-              <label for="discountPercentage" class="form-label">Discount Percentage</label>
-              <input type="number" class="form-control" id="discountPercentage" min="0" max="100" required>
+              <label for="discountProductId" class="form-label">Order ID</label>
+              <input type="text" class="form-control" id="discountProductId" readonly>
+            </div>
+            <div class="mb-3">
+              <label for="discountInput" class="form-label">Discount Percentage</label>
+              <input type="number" class="form-control" id="discountInput" min="0" max="100" required>
             </div>
           </form>
         </div>

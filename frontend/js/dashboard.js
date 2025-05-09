@@ -60,6 +60,44 @@ function initProductsTable() {
         tbody.appendChild(row);
     });
 }
+function openDiscountModal(productId) {
+    const product = productsList.find(p => p._id === productId);
+    if (!product) {
+        alert("Product not found!");
+        return;
+    }
+    const modal = new bootstrap.Modal(document.getElementById("discountModal"));
+    modal.show();
+    document.getElementById("discountInput").value = product.discount;
+    document.getElementById("discountProductId").value = product._id;
+}
+
+document.getElementById("applyDiscountButton").addEventListener("click", async () => {
+
+        const discount = parseInt(document.getElementById("discountInput").value);
+        const productId = document.getElementById("discountProductId").value;
+
+        if (isNaN(discount) || discount < 0 || discount > 100) {
+            alert("Invalid discount percentage!");
+            return;
+        }
+
+        const expiryDate = new Date(new Date() + 7 * 24 * 60 * 60 * 1000).toISOString();
+        console.log(expiryDate);
+
+        const data = await makeRequest(`${host}/api/products/${productId}/discount`, 'PUT', { discount: discount, expirayDate: expiryDate }, token);
+        console.log(data);
+        if (!data.success){
+            alert("Failed to set discount!");
+            return;
+        }
+        alert("Discount set successfully!");
+        const modal = bootstrap.Modal.getInstance(document.getElementById("discountModal"));
+        modal.hide();
+        productsList = await fetchProducts();
+        initProductsTable();
+    
+});
 
 async function addProduct () {
 
@@ -320,3 +358,4 @@ window.openEditModal = openEditModal;
 window.updateProduct = updateProduct;
 window.updateOrderStatus = updateOrderStatus;
 window.viewOrderDetails = viewOrderDetails;
+window.openDiscountModal = openDiscountModal;

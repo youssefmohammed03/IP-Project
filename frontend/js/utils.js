@@ -1,5 +1,6 @@
 let host = "http://localhost:3000";
-export const envToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MWQxYmJkYzk2Y2ExYjZkNzVhOWM4OCIsImVtYWlsIjoiYWRtaW5Ac3lzdGVtLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0NjczODE2MiwiZXhwIjoxNzQ2ODI0NTYyfQ.Q3PDQYrWwrL2fH5t6ckj70cNnkYsPhlJcZ79oSA18fA";
+let token = getCookie('token');
+export const envToken = token;
 
 
 export async function fetchProducts() {
