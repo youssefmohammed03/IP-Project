@@ -477,16 +477,34 @@ async function submitReview() {
 
 async function addProductToCart() {
     try {
+        const selectedSizeInput = document.querySelector('input[name="size"]:checked');
+
+        if (product.availableSizes && product.availableSizes.length > 0 && !selectedSizeInput) {
+            alert('Please select a size before adding to cart');
+            return;
+        }
+
+        const selectedSize = selectedSizeInput ? selectedSizeInput.value : null;
+
+        const quantity = parseInt(document.getElementById('quantity').textContent);
+
         let itemBody = {
             productId: product._id,
-            quantity: parseInt(document.getElementById('quantity').textContent)
+            quantity: quantity
+        };
+
+        if (selectedSize) {
+            itemBody.size = selectedSize;
         }
+
+        console.log("Adding to cart:", itemBody);
 
         await addToCart(itemBody, getCookie('token'));
 
         alert('Product added to cart successfully!');
     } catch (err) {
         console.error('Error adding product to cart', err);
+        alert('Failed to add product to cart: ' + (err.message || 'Unknown error'));
     }
 }
 

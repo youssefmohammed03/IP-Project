@@ -114,54 +114,90 @@ async function deleteProduct(productId) {
 }
 
 function openEditModal(productId) {
-    console.log(productId);
     const product = productsList.find(p => p._id === productId);
     if (!product) {
         alert("Product not found!");
         return;
     }
 
+    // Populate the form with product details
     document.getElementById("editProductId").value = product._id;
     document.getElementById("editProductName").value = product.name;
-    document.getElementById("editProductPrice").value = parseFloat(product.price);
+    document.getElementById("editProductPrice").value = product.price;
     document.getElementById("editProductStock").value = product.countInStock;
-    document.getElementById("editProductCategory").value = product.categories;
-    document.getElementById("editProductImage").value = product.imagePath;
+
+    // Handle categories - check if it's an array and get the first element
+    const category = Array.isArray(product.categories) ?
+        product.categories[0] : product.categories;
+    document.getElementById("editProductCategory").value = category || '';
+
+    // Handle image path - might be stored in different property names
+    document.getElementById("editProductImage").value =
+        product.imagePath || product.imgPath || '';
 
     const editModal = new bootstrap.Modal(document.getElementById("editProductModal"));
     editModal.show();
 }
 
-function updateProduct() {
-    const productId = parseInt(document.getElementById("editProductId").value);
-    const name = document.getElementById("editProductName").value;
-    const price = parseFloat(document.getElementById("editProductPrice").value);
-    const stock = parseInt(document.getElementById("editProductStock").value);
-    const category = document.getElementById("editProductCategory").value;
-    const imgPath = document.getElementById("editProductImage").value;
+async function updateProduct() {
+    try {
+        const productId = document.getElementById("editProductId").value;
+        const name = document.getElementById("editProductName").value;
+        const price = parseFloat(document.getElementById("editProductPrice").value);
+        const stock = parseInt(document.getElementById("editProductStock").value);
+        const category = document.getElementById("editProductCategory").value;
+        const imgPath = document.getElementById("editProductImage").value;
 
-    const productIndex = productsList.findIndex(p => p._id === productId);
-    if (productIndex === -1) {
-        alert("Product not found!");
-        return;
+        // Validate inputs
+        if (!name || isNaN(price) || isNaN(stock)) {
+            alert("Please fill all required fields with valid values");
+            return;
+        }
+
+        // Prepare data for API call
+        const updatedProduct = {
+            name: name,
+            price: price,
+            countInStock: stock,
+            categories: [category],
+            imagePath: imgPath
+        };
+
+        // Make API call to update the product
+        const response = await fetch(`/api/products/${productId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatedProduct)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to update product');
+        }
+
+        // Get updated product from response
+        const updatedProductData = await response.json();
+
+        // Update local data
+        const productIndex = productsList.findIndex(p => p._id === productId);
+        if (productIndex !== -1) {
+            productsList[productIndex] = updatedProductData;
+        } else {
+            // If not found, refresh the entire list
+            productsList = await fetchProducts();
+        }
+
+        // Close modal and refresh UI
+        const modal = bootstrap.Modal.getInstance(document.getElementById("editProductModal"));
+        modal.hide();
+        initProductsTable();
+        alert("Product updated successfully!");
+    } catch (error) {
+        console.error('Error updating product:', error);
+        alert(`Failed to update product: ${error.message}`);
     }
-
-    productsList[productIndex] = {
-        ...productsList[productIndex],
-        name: name,
-        price: price,
-        countInStock: stock,
-        categories: [category],
-        imagePath: imgPath
-    };
-
-    alert("Product updated successfully!");
-    const modal = bootstrap.Modal.getInstance(document.getElementById("editProductModal"));
-    modal.hide();
-
-    // Optionally, refresh the product table or UI
-    console.log(productsList);
-    initProductsTable();
 }
 
 function initOrdersTable() {

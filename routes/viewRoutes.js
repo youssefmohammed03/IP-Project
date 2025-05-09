@@ -29,6 +29,9 @@ router.get('/cart', auth, serveHtmlFile('cart.html'));
 // Checkout page
 router.get('/checkout', auth, serveHtmlFile('checkout.html'));
 
+// orders page
+router.get('/myorders', auth, serveHtmlFile('orders.html'));
+
 // User profile page
 router.get('/profile', auth, serveHtmlFile('profile.html'));
 
