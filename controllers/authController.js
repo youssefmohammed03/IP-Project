@@ -143,9 +143,23 @@ const updateUserRole = async (req, res) => {
     }
 };
 
+// @desc    Get all users
+// @route   GET /api/auth/users
+// @access  Admin only
+const getAllUsers = async (req, res) => {
+    try {
+        const users = await User.find().select('-password');
+        res.status(200).json(users);
+    } catch (error) {
+        console.error('Error in getAllUsers:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
 module.exports = {
     register,
     login,
     getCurrentUser,
-    updateUserRole
+    updateUserRole,
+    getAllUsers
 };

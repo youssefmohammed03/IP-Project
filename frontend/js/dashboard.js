@@ -5,6 +5,18 @@ let ordersList = await fetchOrders();
 let token = getCookie('token');
 let host = "http://localhost:3000";
 
+async function fetchUsers(){
+    try {
+        const res = await makeRequest(`${host}/api/auth/users`, 'GET', null, token);
+        console.log(res);
+        return res;
+    } catch (err) {
+        console.error('Error fetching users', err);
+    }
+}
+
+let users = await fetchUsers();
+
 async function initializeTables() {
     if (productsList.length === 0) {
         await addAllProducts();
@@ -60,6 +72,43 @@ function initProductsTable() {
         tbody.appendChild(row);
     });
 }
+
+function initUsersTable() {
+    let tbody = document.getElementById("rolesTableBody");
+    tbody.innerHTML = ""; // Clear existing rows
+    users.forEach((user) => {
+        let row = document.createElement("tr");
+        row.innerHTML = `<td class="user-cell">${user._id}</td>
+                         <td class="user-cell">${user.name}</td>
+                         <td class="user-cell">${user.role}</td>
+                         <td class="user-cell">
+                            <select class="form-select" id="userRoleSelect-${user._id}">
+                                <option value="admin">Admin</option>
+                                <option value="customer">Customer</option>
+                            </select>
+                         </td>
+                         <td class="user-cell">
+                            <button class="btn btn-primary" onclick="updateUserRole('${user._id}')">Apply</button>
+                         </td>`;
+        tbody.appendChild(row);
+    });
+}
+
+initUsersTable();
+
+async function updateUserRole(userId) {
+    const role = document.getElementById(`userRoleSelect-${userId}`).value;
+    let data = await makeRequest(`${host}/api/auth/role/${userId}`, 'PUT', { role: role }, token);
+    console.log(data);
+    if (data.role !== role) {
+        alert("Failed to update user role!");
+        return;
+    }
+    alert("User role updated successfully!");
+    users = await fetchUsers();
+    initUsersTable();
+}
+
 function openDiscountModal(productId) {
     const product = productsList.find(p => p._id === productId);
     if (!product) {
@@ -359,3 +408,4 @@ window.updateProduct = updateProduct;
 window.updateOrderStatus = updateOrderStatus;
 window.viewOrderDetails = viewOrderDetails;
 window.openDiscountModal = openDiscountModal;
+window.updateUserRole = updateUserRole;

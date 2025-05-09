@@ -42,6 +42,11 @@
           Orders
         </button>
       </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="roles-tab" data-bs-toggle="tab" data-bs-target="#roles" type="button" role="tab">
+          Manage Roles
+        </button>
+      </li>
     </ul>
 
     <!-- Tab Content -->
@@ -88,6 +93,27 @@
             </thead>
             <tbody id="orderTableBody">
               <!-- Dynamic order rows go here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Manage Roles Tab -->
+      <div class="tab-pane fade" id="roles" role="tabpanel">
+        <h4 class="mb-3">Manage User Roles</h4>
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover align-middle">
+            <thead class="table-dark">
+              <tr>
+                <th>User ID</th>
+                <th>User Name</th>
+                <th>Current Role</th>
+                <th>New Role</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="rolesTableBody">
+              <!-- Dynamic user role rows go here -->
             </tbody>
           </table>
         </div>
