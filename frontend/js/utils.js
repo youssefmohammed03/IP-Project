@@ -308,7 +308,7 @@ export async function fetchProductById(id) {
     }
 }
 
-export function filterProducts(productsList, filters){
+export function filterProducts(productsList, filters) {
     let filteredProducts = productsList.filter((product) => {
         
         const price = parseInt(product.price);
@@ -316,48 +316,109 @@ export function filterProducts(productsList, filters){
             return false;
         }
 
-        for(let size in filters.sizes) {
-            if(filters.sizes[size] && !product.availableSizes.includes(size)) {
-                return false;
+        // Filter by sizes
+        let sizeMatch = true;
+        let hasSizeFilter = false;
+
+        for (let size in filters.sizes) {
+            if (filters.sizes[size]) {
+                hasSizeFilter = true;
+                if (!product.availableSizes.includes(size)) {
+                    sizeMatch = false;
+                    break;
+                }
             }
         }
 
-        for(let style in filters.styles) {
-            if(filters.styles[style] && !product.categories.includes(style)) {
-                return false;
+        if (hasSizeFilter && !sizeMatch) {
+            return false;
+        }
+
+        // Filter by styles/categories
+        let styleMatch = true;
+        let hasStyleFilter = false;
+
+        for (let style in filters.styles) {
+            if (filters.styles[style]) {
+                hasStyleFilter = true;
+                if (!product.categories.includes(style)) {
+                    styleMatch = false;
+                    break;
+                }
             }
         }
 
-        if(filters.rating > product.rating) {
+        if (hasStyleFilter && !styleMatch) {
+            return false;
+        }
+
+        // Filter by rating
+        if (filters.rating > product.rating) {
             return false;
         }
 
         return true;
     });
+
     return filteredProducts;
 }
 
-export function specialSearchProducts(productsList, searchTerm) {
-    
-    if (searchTerm.toLowerCase() == "new") {
-        return productsList.sort((a, b) => {
-            return new Date(b.arrivalDate) - new Date(a.arrivalDate);
-        }).slice(0, 10);
-    }
-    
-    if (searchTerm.toLowerCase() == "sale"){
-        return productsList.filter((product) => {
-            return product.discount > 0;
-        }).sort((a, b) => {
-            return new Date(a.id) - new Date(b.id);
-        });
-    }
+export async function specialSearchProducts(productsList, searchTerm) {
+    try {
+        if (searchTerm.toLowerCase() === "new") {
+            // Fetch newest products (sort by creation date)
+            const response = await fetch(`${API_BASE_URL}/products?sort=createdAt:desc&limit=10`);
+            if (!response.ok) throw new Error('Failed to fetch new products');
+            const data = await response.json();
+            return data.products || [];
+        }
 
-    if (searchTerm.toLowerCase() == "all"){
+        if (searchTerm.toLowerCase() === "sale") {
+            // Fetch products with discount
+            const response = await fetch(`${API_BASE_URL}/products?discount=true`);
+            if (!response.ok) throw new Error('Failed to fetch sale products');
+            const data = await response.json();
+            return data.products || [];
+        }
+
+        if (searchTerm.toLowerCase() === "all") {
+            // Fetch all products
+            const response = await fetch(`${API_BASE_URL}/products`);
+            if (!response.ok) throw new Error('Failed to fetch all products');
+            const data = await response.json();
+            return data.products || [];
+        }
+
+        return productsList;
+    } catch (error) {
+        console.error('Error in specialSearchProducts:', error);
         return productsList;
     }
-    
-    return [];
+}
+
+export async function keyFilterProducts(productsList, keyFilter) {
+    try {
+        const [key, value] = keyFilter.split("-");
+
+        if (key === "categories") {
+            // Filter by category
+            const response = await fetch(`${API_BASE_URL}/products?category=${value}`);
+            if (!response.ok) throw new Error('Failed to fetch products by category');
+            const data = await response.json();
+            return data.products || [];
+        }
+
+        // For other keys, filter locally
+        return productsList.filter((product) => {
+            return product[key] &&
+                (Array.isArray(product[key]) ?
+                    product[key].includes(value) :
+                    product[key] === value);
+        });
+    } catch (error) {
+        console.error('Error in keyFilterProducts:', error);
+        return productsList;
+    }
 }
 
 export function keyFilterProducts(productsList, keyFilter){

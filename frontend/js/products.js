@@ -2,11 +2,13 @@ import { fetchProducts, specialSearchProducts, keyFilterProducts, searchProducts
 
 let maxPrice = 500;
 let minPrice = 0;
+let productsList = [];
+let isLoading = true;
 
 let filters = {
     minPrice: minPrice,
     maxPrice: maxPrice,
-    
+
     sizes: {
         "xxsmall": false,
         "xsmall": false,
@@ -24,40 +26,111 @@ let filters = {
         "party": false,
         "gym": false
     },
-    
+
     rating: 0
 };
 
-let productsList = await fetchProducts();
-
-const params = new URLSearchParams(window.location.search);
-const productSearch = params.get('search'); 
-const productKey = params.get("key");
-const productQuery = params.get("query");
-
-if (productSearch){
-    let filteredProductsList = specialSearchProducts(productsList, productSearch);
-    if (filteredProductsList){
-        productsList = filteredProductsList;
-        document.getElementById('products-title').innerHTML += (" - " + productSearch);
-    }
-} else if (productKey){
-    let filteredProductsList = keyFilterProducts(productsList, productKey);
-    if (filteredProductsList){
-        productsList = filteredProductsList;
-        document.getElementById(`${productKey.split("-")[1]}-style`).checked = true;
-        updateFilters(document.getElementById(`${productKey.split("-")[1]}-style`));
-    }
-} else if (productQuery){
-    let filteredProductsList = searchProducts(productsList, productQuery);
-    productsList = filteredProductsList;
+// Create loading spinner function
+function showLoadingSpinner(elementId) {
+    const element = document.getElementById(elementId);
+    element.innerHTML = `
+        <div class="d-flex justify-content-center my-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    `;
 }
 
-function updateFilters(element){
+// Show error message function
+function showErrorMessage(elementId, message) {
+    const element = document.getElementById(elementId);
+    element.innerHTML = `
+        <div class="alert alert-danger my-3" role="alert">
+            <h4 class="alert-heading">Error!</h4>
+            <p>${message}</p>
+            <hr>
+            <p class="mb-0">Please try again later or contact support if the problem persists.</p>
+        </div>
+    `;
+}
+
+// Display loading spinner while fetching products
+showLoadingSpinner("products-body");
+
+// Main function to initialize products
+async function initProducts() {
+    try {
+        const params = new URLSearchParams(window.location.search);
+        const productSearch = params.get('search');
+        const productKey = params.get("key");
+        const productQuery = params.get("query");
+
+        // Initialize productsList
+        productsList = await fetchProducts();
+
+        // Determine min and max price from products
+        if (productsList.length > 0) {
+            const prices = productsList.map(product => product.price);
+            minPrice = Math.min(...prices);
+            maxPrice = Math.max(...prices);
+            filters.minPrice = minPrice;
+            filters.maxPrice = maxPrice;
+        }
+
+        // Apply search filters
+        if (productSearch) {
+            let filteredProductsList = await specialSearchProducts(productsList, productSearch);
+            if (filteredProductsList && filteredProductsList.length > 0) {
+                productsList = filteredProductsList;
+                document.getElementById('products-title').innerHTML += (" - " + productSearch);
+            }
+        } else if (productKey) {
+            let filteredProductsList = await keyFilterProducts(productsList, productKey);
+            if (filteredProductsList && filteredProductsList.length > 0) {
+                productsList = filteredProductsList;
+                const styleValue = productKey.split("-")[1];
+                const styleElement = document.getElementById(`${styleValue}-style`);
+                if (styleElement) {
+                    styleElement.checked = true;
+                    updateFilters(styleElement);
+                }
+            }
+        } else if (productQuery) {
+            let filteredProductsList = await searchProducts(productsList, productQuery);
+            productsList = filteredProductsList;
+        }
+
+        isLoading = false;
+        productBuilder("products-body", filters);
+
+        // Initialize price inputs
+        document.getElementById("Min-Price").max = maxPrice;
+        document.getElementById("Min-Price").min = minPrice;
+        document.querySelector(`label[for="Min-Price"]`).innerHTML = "Min Price: " + minPrice;
+        document.getElementById("Min-Price").value = minPrice;
+
+        document.getElementById("Max-Price").max = maxPrice;
+        document.getElementById("Max-Price").min = minPrice;
+        document.querySelector(`label[for="Max-Price"]`).innerHTML = "Max Price: " + maxPrice;
+        document.getElementById("Max-Price").value = maxPrice;
+
+    } catch (error) {
+        console.error("Error initializing products:", error);
+        isLoading = false;
+        showErrorMessage("products-body", "Failed to load products. " + error.message);
+    }
+}
+
+// Call the initialization function
+initProducts();
+
+// Update filters function
+function updateFilters(element) {
     let filter = element.id.split("-");
-    switch (filter[1]){
+    switch (filter[1]) {
         case "Price":
-            switch (filter[0]){
+            switch (filter[0]) {
                 case "Min":
                     filters.minPrice = element.value;
                     break;
@@ -80,22 +153,22 @@ function updateFilters(element){
     productBuilder("products-body", filters);
 }
 
-function setLabelValue(element){
+function setLabelValue(element) {
     let id = element.id;
     let label = document.querySelector(`label[for="${id}"]`);
     if (label) {
         label.innerHTML = id.replace("-", " ") + ": " + element.value;
-    }else{
+    } else {
         console.error("Label not found for element with id: " + id);
     }
 }
 
-function closeFilters(){
+function closeFilters() {
     let filters = document.getElementById("filters");
     filters.classList.remove("show");
 }
 
-function applyFilters(){
+function applyFilters() {
     productBuilder("products-body", filters);
 }
 
@@ -103,7 +176,24 @@ function productBuilder(elementID, searchFilter) {
     let element = document.getElementById(elementID);
     element.innerHTML = ""; // Clear previous content
 
+    // If still loading, show spinner
+    if (isLoading) {
+        showLoadingSpinner(elementID);
+        return;
+    }
+
+    // Filter products
     let products = filterProducts(productsList, searchFilter);
+
+    if (products.length === 0) {
+        element.innerHTML = `
+            <div class="alert alert-info my-3" role="alert">
+                No products match your filters. Try adjusting your search criteria.
+            </div>
+        `;
+        return;
+    }
+
     const productsPerPage = 12;
     const totalPages = Math.ceil(products.length / productsPerPage);
     let currentPage = 1;

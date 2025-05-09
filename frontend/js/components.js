@@ -12,25 +12,25 @@ class NavBar extends HTMLElement {
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
                             <li class="nav-item">
-                                <a class="nav-link" href="./products.html">Shop</a>
+                                <a class="nav-link" href="./products">Shop</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="./products.html?search=sale">On Sale</a>
+                                <a class="nav-link" href="./products?search=sale">On Sale</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="./products.html?search=new">New Arrivals</a>
+                                <a class="nav-link" href="./products?search=new">New Arrivals</a>
                             </li>
                             <form class="d-flex" role="search">
                                 <input id="nav-search" class="form-control me-2" type="search"
                                     placeholder="Search for Products..." aria-label="Search">
-                                <button class="btn btn-outline-dark rounded-5" onclick="window.open(\`products.html?query=\${document.getElementById('nav-search').value}\`, '_blank');">
+                                <button class="btn btn-outline-dark rounded-5" onclick="window.open(\`products?query=\${document.getElementById('nav-search').value}\`, '_blank');">
                                     <i class="bi bi-search"></i>
                                 </button>
                             </form>
                         </ul>
                     </div>
-                    <a href="./cart.html" class="mx-3 text-dark"><i class="bi bi-cart4"></i></a>
-                    <a href="./profile.html" class="mx-3 text-dark"><i class="bi bi-person-circle"></i></a>
+                    <a href="./cart" class="mx-3 text-dark"><i class="bi bi-cart4"></i></a>
+                    <a href="./profile" class="mx-3 text-dark"><i class="bi bi-person-circle"></i></a>
                 </div>
             </nav>
         `;

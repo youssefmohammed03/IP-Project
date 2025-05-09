@@ -49,51 +49,126 @@ document.addEventListener('DOMContentLoaded', async () => {
         const res = await axiosAuth.get('/cart');
         console.log(res.data);
         cartBody.innerHTML = '';
-        res.data.cart.items.forEach(item => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${item.product.name}</td>
-            <td>${item.product.price}</td>
+      }
+
+      // Check if cart is empty
+      if (!data.cart.items || data.cart.items.length === 0) {
+        if (cartMessage) {
+          cartMessage.classList.remove('d-none');
+        }
+        if (checkoutBtn) {
+          checkoutBtn.classList.add('disabled');
+        }
+
+        // Reset totals to zero
+        if (subtotalSpan) subtotalSpan.textContent = '0.00';
+        if (totalSpan) totalSpan.textContent = '0.00';
+        return;
+      }
+
+      // Hide empty cart message and enable checkout
+      if (cartMessage) {
+        cartMessage.classList.add('d-none');
+      }
+      if (checkoutBtn) {
+        checkoutBtn.classList.remove('disabled');
+      }      // Display cart items
+      data.cart.items.forEach(item => {
+        if (!cartBody) return;
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>
+              <div class="d-flex align-items-center">
+                <img src="${item.product.imagePath || './assets/Products/missing.png'}" 
+                    alt="${item.name}" 
+                    style="width: 60px; height: 60px; object-fit: cover;" 
+                    class="me-3 rounded">
+                <span>${item.name}</span>
+              </div>
+            </td>
+            <td>$${item.price.toFixed(2)}</td>
+            <td>${item.quantity}</td>
             <td>
               <button class="btn btn-sm btn-danger remove-from-cart" data-id="${item._id}">Remove</button>
             </td>`;
-          cartBody.appendChild(row);
-        });
-        totalSpan.innerText = res.data.total;
-      } catch (err) {
-        console.error('Error loading cart', err);
-      }
+
+        cartBody.appendChild(row);
+      });// Update totals
+      if (totalSpan) totalSpan.textContent = data.total.toFixed(2);
+      if (subtotalSpan) subtotalSpan.textContent = data.total.toFixed(2);
+
+    } catch (err) {
+      console.error('Error loading cart:', err);
     }
-  
-    async function addToCart(productId) {
-      try {
-        await axiosAuth.post('/cart', { productId });
-        fetchCart();
-      } catch (err) {
-        console.error('Add to cart failed', err);
+  }
+
+  async function addToCart(productId) {
+    try {
+      const response = await fetch('/api/cart', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({ productId })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to add item to cart');
       }
+
+      await fetchCart();
+    } catch (err) {
+      console.error('Add to cart failed:', err);
     }
-  
-    async function removeFromCart(itemId) {
-      try {
-        await axiosAuth.delete(`/cart/${itemId}`);
-        fetchCart();
-      } catch (err) {
-        console.error('Remove from cart failed', err);
+  }
+  async function removeFromCart(itemId) {
+    try {
+      const response = await fetch(`/api/cart/${itemId}`, {
+        method: 'DELETE',
+        headers: headers
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to remove item from cart');
       }
+
+      await fetchCart();
+    } catch (err) {
+      console.error('Remove from cart failed:', err);
     }
-  
-    // Event delegation
-    document.addEventListener('click', function(e) {
-      if (e.target.classList.contains('add-to-cart')) {
-        addToCart(e.target.dataset.id);
+  }
+
+  async function clearCart() {
+    try {
+      const response = await fetch('/api/cart', {
+        method: 'DELETE',
+        headers: headers
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to clear cart');
       }
-  
-      if (e.target.classList.contains('remove-from-cart')) {
-        removeFromCart(e.target.dataset.id);
-      }
-    });
-  
-    await fetchProducts();
-    await fetchCart();
+
+      await fetchCart();
+    } catch (err) {
+      console.error('Clear cart failed:', err);
+    }
+  }
+
+  // Event delegation
+  document.addEventListener('click', function (e) {
+    if (e.target.classList.contains('add-to-cart')) {
+      addToCart(e.target.dataset.id);
+    } if (e.target.classList.contains('remove-from-cart')) {
+      removeFromCart(e.target.dataset.id);
+    }
   });
+
+  // Add Clear Cart button event listener
+  const clearCartBtn = document.getElementById('clear-cart-btn');
+  if (clearCartBtn) {
+    clearCartBtn.addEventListener('click', clearCart);
+  }
+
+  await fetchProducts();
+  await fetchCart();
+});

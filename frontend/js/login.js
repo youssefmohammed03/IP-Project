@@ -120,41 +120,38 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         const result = await login(email, password);
-        
+
         if (!result.success) {
             showError('login-tab-pane', result.message);
         }
     });
-    
+
     const registerForm = document.getElementById('register-tab-pane');
     registerForm.addEventListener('submit', async function (e) {
         e.preventDefault();
-        
+
         clearError('register-tab-pane');
-        
+
         const name = document.getElementById('InputName').value;
         const email = document.getElementById('InputEmail2').value;
         const password = document.getElementById('InputPassword2').value;
-        
+
         if (!name || !email || !password) {
             showError('register-tab-pane', 'Please fill in all fields');
             return;
         }
-        
+
         if (password.length < 6) {
             showError('register-tab-pane', 'Password must be at least 6 characters long');
             return;
         }
-        
+
         const result = await register(name, email, password);
-        
+
         if (!result.success) {
             showError('register-tab-pane', result.message);
         }
     });
-    
-    const token = getCookie('token');
-    if (token) {
-        window.location.href = '/';
-    }
+
+
 });

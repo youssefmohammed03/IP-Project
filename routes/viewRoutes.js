@@ -24,18 +24,15 @@ router.get('/products', serveHtmlFile('products.html'));
 router.get('/product/:id', serveHtmlFile('product.html'));
 
 // Cart page
-router.get('/cart', serveHtmlFile('cart.html'));
+router.get('/cart', auth, serveHtmlFile('cart.html'));
 
 // Checkout page
-router.get('/checkout', serveHtmlFile('checkout.html'));
-
-// Orders page
-router.get('/orders', serveHtmlFile('orders.html'));
+router.get('/checkout', auth, serveHtmlFile('checkout.html'));
 
 // User profile page
 router.get('/profile', auth, serveHtmlFile('profile.html'));
 
-// Dashboard page (likely admin only)
-router.get('/dashboard', serveHtmlFile('dashboard.html'));
+// Dashboard page
+router.get('/dashboard', auth, checkRole(['admin']), serveHtmlFile('dashboard.html'));
 
 module.exports = router;
