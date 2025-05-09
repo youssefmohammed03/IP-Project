@@ -82,6 +82,52 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Remove from cart failed', err);
       }
     }
+    
+    async function clearCart() {
+        const cartBody = document.getElementById('cart-body');
+        cartBody.innerHTML = '';
+        document.getElementById('total').textContent = '0';
+        const res = await axiosAuth.delete('/cart');
+        console.log(res);
+        alert('Cart has been cleared!');
+    }
+
+    document.getElementById('confirm-checkout').addEventListener('click', async () => {
+        const address = document.getElementById('address').value;
+        const city = document.getElementById('city').value;
+        const postalCode = document.getElementById('postalCode').value;
+        const country = document.getElementById('country').value;
+        const paymentMethod = document.getElementById('paymentMethod').value;
+        const promoCode = document.getElementById('promoCode').value;
+
+        const orderData = {
+            shippingAddress: {
+                address,
+                city,
+                postalCode,
+                country
+            },
+            paymentMethod,
+            promoCode: promoCode || undefined
+        };
+
+        try {
+            const response = await axios.post('/api/orders', orderData, {
+                headers: {
+                    Authorization: `Bearer ${getCookie('token')}`
+                }
+            });
+
+            if (response.status === 201) {
+                clearCart();
+                alert('Order placed successfully!');
+                // Optionally, redirect or clear the cart
+            }
+        } catch (error) {
+            console.error('Error placing order:', error);
+            alert('Failed to place order. Please try again.');
+        }
+    });
   
     // Event delegation
     document.addEventListener('click', function(e) {
@@ -91,6 +137,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   
       if (e.target.classList.contains('remove-from-cart')) {
         removeFromCart(e.target.dataset.id);
+      }
+
+      if (e.target.classList.contains('clear-cart')) {
+        clearCart();
       }
     });
   
