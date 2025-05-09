@@ -83,8 +83,19 @@ function populateOrdersTable(orders) {
     });
 }
 
-function cancelOrder(orderId) {
-    alert(`Cancel order with ID: ${orderId}`);
+async function cancelOrder(orderId) {
+    let res = await makeRequest(
+        `${host}/api/orders/${orderId}/cancel`,
+        'PUT',
+        null,
+        userToken
+    )
+    if (res.status === "cancelled") {
+        await getOrders();
+        alert(`Cancel order with ID: ${orderId}`);
+    }else{
+        alert(`Failed to cancel order with ID: ${orderId}`);
+    }
     // Add logic to cancel the order
 }
 
@@ -92,6 +103,9 @@ function requestRefund(orderId) {
     alert(`Request refund for order with ID: ${orderId}`);
     // Add logic to request a refund
 }
+
+window.cancelOrder = cancelOrder;
+window.requestRefund = requestRefund;
 
 // Populate the table on page load
 document.addEventListener("DOMContentLoaded", getOrders);
