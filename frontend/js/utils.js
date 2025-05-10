@@ -77,9 +77,9 @@ export function specialSearchProducts(productsList, searchTerm) {
         // Sort by arrival date (newest first) and take the first 10
         return [...productsList]
             .sort((a, b) => {
-                const dateA = a.arrivalDate ? new Date(a.arrivalDate) : new Date(a.createdAt || 0);
-                const dateB = b.arrivalDate ? new Date(b.arrivalDate) : new Date(b.createdAt || 0);
-                return dateB - dateA;
+                const dateA = a.createdAt ? new Date(a.createdAt) : (0);
+                const dateB = b.createdAt ? new Date(b.createdAt) : (0);
+                return dateA - dateB;
             })
             .slice(0, 10);
     }

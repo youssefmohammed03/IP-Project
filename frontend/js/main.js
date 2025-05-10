@@ -19,7 +19,6 @@ function incrementNumber(elementID, maxNumber) {
 function productConainerBuilder(elementID, searchFilter, number) {
     let element = document.getElementById(elementID);
 
-    // TODO: Get products from API based on searchFilter
     var products = specialSearchProducts(productsList, searchFilter).slice(0, number);
 
     element.innerHTML = `<div class="container text-center my-4"><h1 class="title display-5">${elementID.replace("-", " ").toUpperCase()}</h1></div>`;
