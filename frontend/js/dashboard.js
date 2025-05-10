@@ -130,7 +130,7 @@ document.getElementById("applyDiscountButton").addEventListener("click", async (
             return;
         }
 
-        const expiryDate = new Date(new Date() + 7 * 24 * 60 * 60 * 1000).toISOString();
+        const expiryDate = new Date(new Date().now() + 7 * 24 * 60 * 60 * 1000).toISOString();
         console.log(expiryDate);
 
         const data = await makeRequest(`${host}/api/products/${productId}/discount`, 'PUT', { discount: discount, expirayDate: expiryDate }, token);
@@ -400,6 +400,86 @@ function viewOrderDetails(orderId) {
     orderDetailsModal.show();
 }
 
+
+let promotions = await fetchPromotions();
+
+async function fetchPromotions(){
+    let res = await makeRequest(`${host}/api/promotions`, 'GET', null, token);
+    console.log(res);
+    return res;
+}
+
+document.getElementById('promotionForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  const form = e.target;
+  const code = form.code.value;
+  const name = form.name.value;
+  const description = form.description.value;
+  const discount = parseInt(form.discount.value);
+  const minPurchase = parseFloat(form.minPurchase.value);
+  const period = parseInt(form.period.value);
+
+  const expiryDate = new Date(Date.now() + period * 24 * 60 * 60 * 1000);
+
+  const body = {
+    code: code,
+    name: name,
+    description: description,
+    type: "percentage",
+    discount: discount,
+    minPurchase: minPurchase,
+    expiryDate: expiryDate.toISOString().split('T')[0]
+  };
+
+  let res = await makeRequest(`${host}/api/promotions`, 'POST', body, token);
+  console.log(res);
+
+  if(res.code !== code){
+    alert("Failed to add promotion!");
+    return;
+  }
+
+  promotions = await fetchPromotions();
+  renderPromotions();
+  const modal = bootstrap.Modal.getInstance(document.getElementById("addPromotionModal"));
+  modal.hide();
+  form.reset();
+});
+
+function renderPromotions() {
+  const tbody = document.getElementById('promotionTableBody');
+  tbody.innerHTML = '';
+
+  promotions.forEach(promo => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${promo._id}</td>
+      <td>${promo.code}</td>
+      <td>${promo.name}</td>
+      <td>${promo.discount}%</td>
+      <td>${promo.expiryDate.split('T')[0]}</td>
+      <td>${promo.isActive ? 'Yes' : 'No'}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="deletePromotion('${promo._id}')">Delete</button></td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+renderPromotions();
+
+async function deletePromotion(id) {
+    console.log(id);
+    let res = await makeRequest(`${host}/api/promotions/${id}`, 'DELETE', null, token);
+    if(res.message != "Promotion deleted successfully"){
+        alert("Failed to delete promotion!");
+        return;
+    }
+    promotions = await fetchPromotions();
+    renderPromotions();
+}
+
+
 window.addProduct = addProduct;
 window.deleteProduct = deleteProduct;
 window.openEditModal = openEditModal;
@@ -408,3 +488,4 @@ window.updateOrderStatus = updateOrderStatus;
 window.viewOrderDetails = viewOrderDetails;
 window.openDiscountModal = openDiscountModal;
 window.updateUserRole = updateUserRole;
+window.deletePromotion = deletePromotion;
